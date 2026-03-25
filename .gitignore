@@ -1,0 +1,71 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# PyCharm / JetBrains
+.idea/
+*.iml
+.fleet/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+.python-version
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+site/
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Test / runtime artifacts
+*.log
+*.pid
+*.pid.lock
+*.out
+*.err
+coverage/
+coverage.xml
+junit.xml
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Frontend / Vue / TypeScript
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.turbo/
+.vite/
+vite.svg
+*.tsbuildinfo
+
+# Docker / local data volumes
+data/*
+!data/.gitkeep
+
+# Temporary files
+tmp/
+temp/
+*.tmp

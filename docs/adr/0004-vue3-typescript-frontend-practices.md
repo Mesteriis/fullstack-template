@@ -12,7 +12,13 @@
 Для deployable frontend-приложения принимается следующая структура:
 
 ```text
-apps/web/
+src/frontend/
+  package.json
+  package-lock.json
+  vite.config.ts
+  index.html
+  main.ts
+  App.vue
   app/                 # bootstrap, router, providers, layouts
   pages/               # route-level экраны
   features/            # бизнес-фичи
@@ -31,7 +37,8 @@ apps/web/
 Правила разработки:
 
 - Используется Vue 3 + TypeScript. Основной стиль компонентов: Composition API и `script setup`. Options API допускается только как исключение для совместимости со сторонними библиотеками.
-- Каталог `src/` не используется. Каталоги `app/`, `pages/`, `features/`, `entities/` и `shared/` лежат в корне `apps/web/`.
+- Frontend живёт в `src/frontend/`, а его toolchain manifests (`package.json`, lock-файл, `vite.config.ts`) лежат рядом с приложением, а не в корне репозитория.
+- В минимальной стадии допустимы `main.ts`, `App.vue` и базовые конфиги в корне `src/frontend/`. По мере роста приложение раскладывается по `app/`, `pages/`, `features/`, `entities/` и `shared/`.
 - TypeScript работает в строгом режиме. `any` в коде приложения запрещается, кроме локально обоснованных адаптеров на границе со сторонним кодом.
 - Компонент по умолчанию живёт рядом с фичей или страницей. Перенос в `shared/ui` допускается только после подтверждённого повторного использования.
 - Компоненты и страницы не ходят в API напрямую. Работа с сетью инкапсулируется в `shared/api` и feature-level composable.
@@ -42,7 +49,7 @@ apps/web/
 
 Правила тестирования:
 
-- unit/component тесты выполняются через Vitest;
+- unit/component тесты выполняются через Vitest и живут в `src/frontend/tests`;
 - пользовательские сценарии на уровне приложения выполняются через `tests/e2e` репозитория;
 - критичные формы и интеграционные точки проверяются через тесты с моками generated client или contract fixtures.
 

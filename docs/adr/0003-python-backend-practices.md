@@ -12,14 +12,15 @@
 Для deployable backend-приложения принимается следующая структура:
 
 ```text
-apps/api/
-  <service_name>/
-    api/               # FastAPI routers, dependencies, transport schemas
-    application/       # use cases, orchestration, ports
-    domain/            # бизнес-сущности и чистые правила
-    infrastructure/    # async SQLAlchemy/PostgreSQL, HTTP clients, adapters, repositories
-    settings/          # конфигурация приложения
-    main.py            # сборка FastAPI app и wiring
+src/backend/
+  pyproject.toml
+  uv.lock
+  api/                 # FastAPI routers, dependencies, transport schemas
+  application/         # use cases, orchestration, ports
+  domain/              # бизнес-сущности и чистые правила
+  infrastructure/      # async SQLAlchemy/PostgreSQL, HTTP clients, adapters, repositories
+  settings/            # конфигурация приложения
+  main.py              # сборка FastAPI app и wiring
   tests/
     unit/
     integration/
@@ -30,9 +31,10 @@ alembic.ini
 Правила разработки:
 
 - `uv` используется как стандартный инструмент для управления зависимостями и запуска команд.
+- Python-манифесты backend (`pyproject.toml`, `uv.lock`) лежат в `src/backend/`, а не в корне репозитория. Это подчёркивает, что монорепа не является Python-first.
 - Все публичные функции, методы и модели имеют явную типизацию. Непротипизированный production-код не считается допустимым по умолчанию.
 - `ruff` используется для lint/format, `pytest` для тестов, статическая проверка типов обязательна через `mypy` или `pyright`.
-- Каталог `src/` не используется. Пакет приложения живёт напрямую внутри `apps/api/`.
+- Исходный код backend живёт в `src/backend/`. Если приложение небольшое, допустимы `main.py` и несколько модулей в корне backend; при росте код раскладывается по `api/`, `application/`, `domain/`, `infrastructure/`, `settings/`.
 - FastAPI и Pydantic ограничиваются transport/boundary-слоем. Доменные сущности и application-логика не должны зависеть от FastAPI.
 - Бизнес-логика не размещается в роутерах. Роутер принимает запрос, валидирует вход и делегирует use case.
 - Основной стек backend: FastAPI, Alembic, async PostgreSQL.
@@ -44,8 +46,8 @@ alembic.ini
 
 Правила тестирования:
 
-- unit-тесты покрывают `domain/` и `application/` без сети и без реальной БД;
-- integration-тесты проверяют адаптеры, БД и внешние клиенты на уровне приложения;
+- unit-тесты покрывают `domain/` и `application/` без сети и без реальной БД и живут в `src/backend/tests/unit`;
+- integration-тесты проверяют адаптеры, БД и внешние клиенты на уровне приложения и живут в `src/backend/tests/integration`;
 - contract-тесты живут на уровне репозитория в `tests/contract`, если они проверяют соответствие OpenAPI/AsyncAPI.
 
 ## Последствия

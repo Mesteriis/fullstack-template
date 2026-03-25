@@ -1,7 +1,7 @@
 [project]
-name = "registries"
+name = "registries-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Backend service for the registries monorepo"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.135.2",
