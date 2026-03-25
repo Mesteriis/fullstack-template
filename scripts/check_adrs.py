@@ -51,7 +51,7 @@ def validate_root_readme(errors: list[str]) -> None:
         expected_link = f"[{category}/](./{category}/README.md)"
         if expected_link not in content:
             errors.append(
-                f"{readme_path.relative_to(ROOT)} must link to {category}/README.md to keep ADR navigation explicit"
+                f"{readme_path.relative_to(ROOT)} must link to {category}/README.md so ADR navigation stays explicit."
             )
 
 
@@ -62,8 +62,28 @@ def validate_index(category: str, errors: list[str]) -> None:
     indexed = find_links(readme_path)
     if indexed != actual:
         errors.append(
-            f"{readme_path.relative_to(ROOT)} index mismatch: indexed={indexed}, actual={actual}"
+            f"{readme_path.relative_to(ROOT)} index mismatch: indexed={indexed}, actual={actual}. "
+            "Category indexes must describe the real ADR set exactly."
         )
+
+
+def classify_adr_file(path: Path) -> str | None:
+    try:
+        relative_path = path.relative_to(ADR_ROOT)
+    except ValueError:
+        return None
+
+    parts = relative_path.parts
+    if len(parts) != 2:
+        return None
+
+    category, file_name = parts
+    rule = CATEGORY_RULES.get(category)
+    if rule is None or not rule.fullmatch(file_name):
+        return None
+    if file_name == "README.md":
+        return None
+    return category
 
 
 def validate_related_adrs(path: Path, content: str, errors: list[str]) -> None:
@@ -73,34 +93,61 @@ def validate_related_adrs(path: Path, content: str, errors: list[str]) -> None:
         flags=re.DOTALL,
     )
     if not related_section_match:
-        errors.append(f"{path.relative_to(ROOT)} must contain a Related ADRs section")
+        errors.append(f"{path.relative_to(ROOT)} must contain a Related ADRs section.")
         return
 
     related_links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", related_section_match.group(1))
     if not related_links:
-        errors.append(f"{path.relative_to(ROOT)} must link at least one related ADR")
+        errors.append(
+            f"{path.relative_to(ROOT)} must link at least one related ADR. Dummy headings without relationships are forbidden."
+        )
         return
 
+    seen_targets: set[Path] = set()
     for link in related_links:
         related_path = (path.parent / link).resolve()
+        if related_path == path.resolve():
+            errors.append(
+                f"{path.relative_to(ROOT)} links itself in Related ADRs via '{link}'. Self-reference does not describe a real relationship."
+            )
+            continue
+
+        if related_path in seen_targets:
+            errors.append(
+                f"{path.relative_to(ROOT)} repeats Related ADR link '{link}'. Relationship links must be unique."
+            )
+            continue
+        seen_targets.add(related_path)
+
         try:
             related_path.relative_to(ADR_ROOT)
         except ValueError:
-            errors.append(f"{path.relative_to(ROOT)} links Related ADR outside docs/adr: {link}")
+            errors.append(
+                f"{path.relative_to(ROOT)} links Related ADR outside docs/adr via '{link}'. Relationships must stay inside the ADR system."
+            )
             continue
+
         if not related_path.is_file():
-            errors.append(f"{path.relative_to(ROOT)} links missing Related ADR target: {link}")
+            errors.append(
+                f"{path.relative_to(ROOT)} links missing Related ADR target '{link}'. Related decisions must point to real ADR files."
+            )
+            continue
+
+        if classify_adr_file(related_path) is None:
+            errors.append(
+                f"{path.relative_to(ROOT)} links '{link}', but the target is not a valid ADR file. Related links must reference numbered ADR documents only."
+            )
 
 
 def validate_status(path: Path, content: str, errors: list[str]) -> None:
     status_match = re.search(r"^- Status:[ \t]*(.+)$", content, flags=re.MULTILINE)
     if not status_match:
-        errors.append(f"{path.relative_to(ROOT)} missing status value")
+        errors.append(f"{path.relative_to(ROOT)} missing status value.")
         return
 
     status = status_match.group(1).strip()
     if status not in STATUS_VALUES:
-        errors.append(f"{path.relative_to(ROOT)} has invalid status '{status}'")
+        errors.append(f"{path.relative_to(ROOT)} has invalid status '{status}'.")
         return
 
     superseded_by_match = re.search(r"^- Superseded by:[ \t]*(.*)$", content, flags=re.MULTILINE)
@@ -109,17 +156,17 @@ def validate_status(path: Path, content: str, errors: list[str]) -> None:
     if status == "Superseded":
         if not superseded_by:
             errors.append(
-                f"{path.relative_to(ROOT)} has status Superseded but an empty '- Superseded by:' field"
+                f"{path.relative_to(ROOT)} has status Superseded but an empty '- Superseded by:' field."
             )
         elif not re.fullmatch(r"ADR-\d{4}", superseded_by):
             errors.append(
-                f"{path.relative_to(ROOT)} must use '- Superseded by: ADR-XXXX' when status is Superseded"
+                f"{path.relative_to(ROOT)} must use '- Superseded by: ADR-XXXX' when status is Superseded."
             )
         return
 
     if superseded_by:
         errors.append(
-            f"{path.relative_to(ROOT)} must leave '- Superseded by:' empty unless status is Superseded"
+            f"{path.relative_to(ROOT)} must leave '- Superseded by:' empty unless status is Superseded."
         )
 
 
@@ -128,36 +175,36 @@ def validate_file(path: Path, category: str, expected_decider: str, errors: list
     file_name = path.name
     rule = CATEGORY_RULES[category]
     if not rule.match(file_name):
-        errors.append(f"{path.relative_to(ROOT)} has invalid filename for category '{category}'")
+        errors.append(f"{path.relative_to(ROOT)} has invalid filename for category '{category}'.")
 
     number = file_name.split("-", 1)[0]
     title_line = f"# ADR-{number}:"
     if not content.startswith(title_line):
-        errors.append(f"{path.relative_to(ROOT)} must start with '{title_line}'")
+        errors.append(f"{path.relative_to(ROOT)} must start with '{title_line}'.")
 
     for field in REQUIRED_FIELDS:
         if f"- {field}:" not in content:
-            errors.append(f"{path.relative_to(ROOT)} missing field '- {field}:'")
+            errors.append(f"{path.relative_to(ROOT)} missing field '- {field}:'.")
 
     validate_status(path, content, errors)
 
     date_match = re.search(r"^- Date:[ \t]*(\d{4}-\d{2}-\d{2})$", content, flags=re.MULTILINE)
     if not date_match:
-        errors.append(f"{path.relative_to(ROOT)} must use Date in YYYY-MM-DD format")
+        errors.append(f"{path.relative_to(ROOT)} must use Date in YYYY-MM-DD format.")
 
     deciders_match = re.search(r"^- Deciders:[ \t]*(.+)$", content, flags=re.MULTILINE)
     if not deciders_match:
-        errors.append(f"{path.relative_to(ROOT)} missing deciders value")
+        errors.append(f"{path.relative_to(ROOT)} missing deciders value.")
     else:
         deciders = deciders_match.group(1).strip()
         if deciders != expected_decider:
             errors.append(
-                f"{path.relative_to(ROOT)} must use '- Deciders: {expected_decider}', found '{deciders}'"
+                f"{path.relative_to(ROOT)} must use '- Deciders: {expected_decider}', found '{deciders}'."
             )
 
     for section in REQUIRED_SECTIONS:
         if section not in content:
-            errors.append(f"{path.relative_to(ROOT)} missing section '{section}'")
+            errors.append(f"{path.relative_to(ROOT)} missing section '{section}'.")
 
     validate_related_adrs(path, content, errors)
 

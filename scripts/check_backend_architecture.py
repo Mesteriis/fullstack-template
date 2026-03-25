@@ -18,6 +18,7 @@ ALLOWED_SAME_CONTEXT_IMPORTS: dict[str, set[str]] = {
     "domain": {"domain"},
     "infrastructure": {"application", "contracts", "domain", "infrastructure"},
 }
+DECLARATIVE_NODES = (ast.Assign, ast.AnnAssign, ast.Import, ast.ImportFrom, ast.Pass, ast.TypeAlias)
 
 
 def module_parts_for(path: Path) -> list[str]:
@@ -34,6 +35,25 @@ def parse_imported_modules(node: ast.AST) -> list[str]:
     return []
 
 
+def is_backend_import(imported: str) -> bool:
+    return imported in BACKEND_DIRS or imported.startswith(BACKEND_IMPORT_PREFIXES)
+
+
+def is_docstring_expr(node: ast.AST) -> bool:
+    return (
+        isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
+    )
+
+
+def is_type_checking_guard(node: ast.AST) -> bool:
+    if not isinstance(node, ast.If):
+        return False
+    test = node.test
+    return isinstance(test, ast.Name) and test.id == "TYPE_CHECKING"
+
+
 def validate_absolute_imports(tree: ast.AST, errors: list[str], path: Path) -> None:
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.level > 0:
@@ -43,12 +63,20 @@ def validate_absolute_imports(tree: ast.AST, errors: list[str], path: Path) -> N
             )
 
 
+def allowed_reexport_scope(parts: list[str]) -> str:
+    if parts and parts[0] == "apps" and len(parts) >= 2:
+        return ".".join(parts[:2])
+    if parts:
+        return parts[0]
+    return ""
+
+
 def validate_illegal_reexports(parts: list[str], tree: ast.AST, errors: list[str], path: Path) -> None:
     if path.name != "__init__.py":
         return
 
-    current_package = ".".join(parts[:-1])
-    if not current_package:
+    reexport_scope = allowed_reexport_scope(parts)
+    if not reexport_scope:
         return
 
     for node in tree.body:
@@ -57,10 +85,12 @@ def validate_illegal_reexports(parts: list[str], tree: ast.AST, errors: list[str
         imported_module = node.module
         if not is_backend_import(imported_module):
             continue
-        if imported_module != current_package and not imported_module.startswith(f"{current_package}."):
-            errors.append(
-                f"{path.relative_to(ROOT)} re-exports '{imported_module}' outside its own package boundary"
-            )
+        if imported_module == reexport_scope or imported_module.startswith(f"{reexport_scope}."):
+            continue
+        errors.append(
+            f"{path.relative_to(ROOT)} re-exports '{imported_module}' outside its allowed boundary '{reexport_scope}'. "
+            "Package exports may not leak other bounded contexts or top-level domains."
+        )
 
 
 def validate_context_imports(parts: list[str], imported: str, errors: list[str], path: Path) -> None:
@@ -75,7 +105,10 @@ def validate_context_imports(parts: list[str], imported: str, errors: list[str],
 
     imported_parts = imported.split(".")
     if len(imported_parts) < 3:
-        errors.append(f"{path.relative_to(ROOT)} imports incomplete app module '{imported}'")
+        errors.append(
+            f"{path.relative_to(ROOT)} imports incomplete app module '{imported}'. "
+            "Cross-context dependencies must point to explicit bounded-context modules."
+        )
         return
 
     imported_context = imported_parts[1]
@@ -92,9 +125,69 @@ def validate_context_imports(parts: list[str], imported: str, errors: list[str],
 
     if imported_layer != "contracts":
         errors.append(
-            f"{path.relative_to(ROOT)} imports internal module of another context via '{imported}'; "
-            "only contracts are allowed cross-context"
+            f"{path.relative_to(ROOT)} imports internal module of another context via '{imported}'. "
+            "Only contracts may cross bounded-context boundaries."
         )
+
+
+def validate_domain_rules(tree: ast.AST, errors: list[str], path: Path) -> None:
+    for node in ast.walk(tree):
+        for imported in parse_imported_modules(node):
+            if imported in {"api", "application", "infrastructure"} or imported.startswith(
+                ("api.", "application.", "infrastructure.")
+            ):
+                errors.append(
+                    f"{path.relative_to(ROOT)} domain layer must not depend on transport or adapter modules via '{imported}'"
+                )
+            if imported.startswith("apps."):
+                imported_parts = imported.split(".")
+                if len(imported_parts) >= 3 and imported_parts[2] in {"api", "application", "infrastructure"}:
+                    errors.append(
+                        f"{path.relative_to(ROOT)} domain layer must not depend on {imported_parts[2]} via '{imported}'"
+                    )
+
+
+def validate_contract_block(
+    nodes: list[ast.stmt],
+    *,
+    path: Path,
+    errors: list[str],
+    owner_name: str | None = None,
+) -> None:
+    for node in nodes:
+        if is_docstring_expr(node) or isinstance(node, DECLARATIVE_NODES):
+            continue
+
+        if is_type_checking_guard(node):
+            validate_contract_block(node.body, path=path, errors=errors, owner_name=owner_name)
+            for else_node in node.orelse:
+                errors.append(
+                    f"{path.relative_to(ROOT)} contracts layer may not execute runtime logic in TYPE_CHECKING fallback blocks; "
+                    f"found {else_node.__class__.__name__}"
+                )
+            continue
+
+        if isinstance(node, ast.ClassDef):
+            validate_contract_block(node.body, path=path, errors=errors, owner_name=node.name)
+            continue
+
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            target = f"class '{owner_name}'" if owner_name is not None else "module scope"
+            errors.append(
+                f"{path.relative_to(ROOT)} contracts layer may not define executable methods or functions in {target}; "
+                f"found {node.__class__.__name__} '{node.name}'"
+            )
+            continue
+
+        target = f"class '{owner_name}'" if owner_name is not None else "module scope"
+        errors.append(
+            f"{path.relative_to(ROOT)} contracts layer may only contain declarative boundary objects in {target}; "
+            f"found {node.__class__.__name__}"
+        )
+
+
+def validate_contract_rules(tree: ast.AST, errors: list[str], path: Path) -> None:
+    validate_contract_block(list(tree.body), path=path, errors=errors)
 
 
 def validate_domain_and_contract_rules(parts: list[str], tree: ast.AST, errors: list[str], path: Path) -> None:
@@ -102,50 +195,10 @@ def validate_domain_and_contract_rules(parts: list[str], tree: ast.AST, errors: 
         return
 
     layer_name = parts[2]
-
     if layer_name == "domain":
-        for node in ast.walk(tree):
-            for imported in parse_imported_modules(node):
-                if imported in {"api", "application", "infrastructure"} or imported.startswith(
-                    ("api.", "application.", "infrastructure.")
-                ):
-                    errors.append(
-                        f"{path.relative_to(ROOT)} domain layer must not depend on top-level transport or adapter modules via '{imported}'"
-                    )
-                if imported.startswith("apps."):
-                    imported_parts = imported.split(".")
-                    if len(imported_parts) >= 3 and imported_parts[2] in {"api", "application", "infrastructure"}:
-                        errors.append(
-                            f"{path.relative_to(ROOT)} domain layer must not depend on {imported_parts[2]} via '{imported}'"
-                        )
-
-    if layer_name != "contracts" or path.name == "__init__.py":
-        return
-
-    for node in tree.body:
-        if isinstance(node, (ast.Import, ast.ImportFrom, ast.AnnAssign)):
-            continue
-        if isinstance(node, ast.Assign):
-            continue
-        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-            continue
-        if isinstance(node, ast.ClassDef):
-            for class_node in node.body:
-                if isinstance(class_node, (ast.AnnAssign, ast.Assign, ast.Pass)):
-                    continue
-                if isinstance(class_node, ast.Expr) and isinstance(class_node.value, ast.Constant) and isinstance(
-                    class_node.value.value, str
-                ):
-                    continue
-                errors.append(
-                    f"{path.relative_to(ROOT)} contracts layer may only contain declarative boundary objects; "
-                    f"found {class_node.__class__.__name__} inside class '{node.name}'"
-                )
-            continue
-        errors.append(
-            f"{path.relative_to(ROOT)} contracts layer may only contain imports, declarative classes and constant assignments; "
-            f"found {node.__class__.__name__}"
-        )
+        validate_domain_rules(tree, errors, path)
+    if layer_name == "contracts" and path.name != "__init__.py":
+        validate_contract_rules(tree, errors, path)
 
 
 def validate_core_imports(parts: list[str], imported: str, errors: list[str], path: Path) -> None:
@@ -176,15 +229,11 @@ def validate_runtime_imports(parts: list[str], imported: str, errors: list[str],
         errors.append(f"{path.relative_to(ROOT)} must not import API layer via '{imported}'")
 
 
-def is_backend_import(imported: str) -> bool:
-    return imported in BACKEND_DIRS or imported.startswith(BACKEND_IMPORT_PREFIXES)
-
-
 def collect_context_dependencies(parts: list[str], tree: ast.AST, context_graph: dict[str, set[str]]) -> None:
     if len(parts) < 4 or parts[0] != "apps":
         return
 
-    current_context = parts[1]
+    current_context = f"apps.{parts[1]}"
     for node in ast.walk(tree):
         for imported in parse_imported_modules(node):
             if not imported.startswith("apps."):
@@ -192,7 +241,7 @@ def collect_context_dependencies(parts: list[str], tree: ast.AST, context_graph:
             imported_parts = imported.split(".")
             if len(imported_parts) < 3:
                 continue
-            imported_context = imported_parts[1]
+            imported_context = f"apps.{imported_parts[1]}"
             if imported_context != current_context:
                 context_graph[current_context].add(imported_context)
 
@@ -213,9 +262,7 @@ def validate_context_cycles(context_graph: dict[str, set[str]], errors: list[str
                 continue
             if dependency in active:
                 cycle = stack[stack.index(dependency) :] + [dependency]
-                errors.append(
-                    "basic cross-context cycle detected: " + " -> ".join(cycle)
-                )
+                errors.append("basic cross-context cycle detected: " + " -> ".join(cycle))
 
         active.remove(node)
         stack.pop()

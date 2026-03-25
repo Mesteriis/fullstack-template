@@ -13,6 +13,7 @@ REPOSITORY_SKELETON_DIRS = {
     "docs/adr/architecture": "max-template requires architecture ADRs as a dedicated decision category",
     "docs/adr/product": "max-template requires product ADRs as a dedicated decision category",
     "docs/adr/engineering": "max-template requires engineering ADRs for template- and process-level decisions",
+    "docs/template": "max-template requires docs/template for self-describing template governance",
     "scripts": "max-template requires scripts/ for machine-enforced repository checks",
     "specs": "max-template requires specs/ because contracts are first-class artifacts",
     "specs/asyncapi": "max-template requires specs/asyncapi to define event contracts explicitly",
@@ -96,6 +97,7 @@ REQUIRED_TOOLING_FILES = {
     "docs/adr/engineering/README.md": "max-template requires engineering ADR index documentation",
     "docs/adr/engineering/2000-centralize-template-metadata-and-self-consistency-checks.md": "max-template requires an engineering ADR for template metadata and self-validation",
     "docs/adr/product/README.md": "max-template requires product ADR index documentation",
+    "docs/template/PHILOSOPHY.md": "max-template requires PHILOSOPHY.md so the repository explains why strictness is architectural, not incidental",
     "migrations/env.py": "max-template requires Alembic environment wiring",
     "migrations/script.py.mako": "max-template requires Alembic revision template wiring",
     "scripts/check_adrs.py": "max-template requires ADR validation",
@@ -168,37 +170,51 @@ RESERVED_PATHS = {
 }
 
 
-def validate_required_paths(paths: dict[str, str], expect_dir: bool, errors: list[str]) -> None:
+def validate_required_paths(paths: dict[str, str], *, expect_dir: bool, errors: list[str]) -> None:
+    path_kind = "directory" if expect_dir else "file"
     for rel_path, reason in paths.items():
         path = ROOT / rel_path
         exists = path.is_dir() if expect_dir else path.is_file()
         if not exists:
-            errors.append(f"{reason}; missing {'directory' if expect_dir else 'file'}: {rel_path}")
+            errors.append(f"{reason}; required {path_kind} is missing: {rel_path}")
 
 
-def validate_forbidden_paths(paths: dict[str, str], expect_dir: bool, errors: list[str]) -> None:
+def validate_forbidden_paths(paths: dict[str, str], *, expect_dir: bool, errors: list[str]) -> None:
+    path_kind = "directory" if expect_dir else "file"
     for rel_path, reason in paths.items():
         path = ROOT / rel_path
         exists = path.is_dir() if expect_dir else path.is_file()
         if exists:
-            errors.append(f"{reason}; forbidden path still exists: {rel_path}")
+            errors.append(f"{reason}; remove forbidden legacy {path_kind}: {rel_path}")
+
+
+def validate_repository_skeleton(errors: list[str]) -> None:
+    validate_required_paths(REPOSITORY_SKELETON_DIRS, expect_dir=True, errors=errors)
+
+
+def validate_required_tooling(errors: list[str]) -> None:
+    validate_required_paths(REQUIRED_TOOLING_FILES, expect_dir=False, errors=errors)
+
+
+def validate_forbidden_legacy(errors: list[str]) -> None:
+    validate_forbidden_paths(FORBIDDEN_ROOT_MANIFESTS, expect_dir=False, errors=errors)
+    validate_forbidden_paths(FORBIDDEN_LEGACY_DIRS, expect_dir=True, errors=errors)
+    validate_forbidden_paths(FORBIDDEN_LEGACY_FILES, expect_dir=False, errors=errors)
 
 
 def validate_reserved_paths(errors: list[str]) -> None:
     for rel_path, reason in RESERVED_PATHS.items():
         path = ROOT / rel_path
         if path.exists() and not path.is_dir():
-            errors.append(f"{reason}; reserved path must be a directory when present: {rel_path}")
+            errors.append(f"{reason}; reserved path must remain a directory when present: {rel_path}")
 
 
 def main() -> int:
     errors: list[str] = []
 
-    validate_required_paths(REPOSITORY_SKELETON_DIRS, expect_dir=True, errors=errors)
-    validate_required_paths(REQUIRED_TOOLING_FILES, expect_dir=False, errors=errors)
-    validate_forbidden_paths(FORBIDDEN_ROOT_MANIFESTS, expect_dir=False, errors=errors)
-    validate_forbidden_paths(FORBIDDEN_LEGACY_DIRS, expect_dir=True, errors=errors)
-    validate_forbidden_paths(FORBIDDEN_LEGACY_FILES, expect_dir=False, errors=errors)
+    validate_repository_skeleton(errors)
+    validate_required_tooling(errors)
+    validate_forbidden_legacy(errors)
     validate_reserved_paths(errors)
 
     if errors:

@@ -31,22 +31,32 @@ dev = [
     "bandit>=1.8.6,<2.0.0",
     "deptry>=0.23.1,<1.0.0",
     "eradicate>=3.0.0,<4.0.0",
+    "faker>=40.11.1",
     "httpx>=0.27.0,<1.0.0",
     "import-linter>=2.11,<3.0.0",
     "mypy>=1.18.2,<2.0.0",
     "pip-audit>=2.9.0,<3.0.0",
+    "polyfactory>=3.3.0",
     "pre-commit>=4.2.0,<5.0.0",
     "pytest>=8.3.0,<10.0.0",
-    "pytest-asyncio>=0.24.0,<2.0.0",
+    "pytest-cov>=7.1.0",
     "pyupgrade>=3.21.0,<4.0.0",
     "ruff>=0.12.0,<1.0.0",
+    "testcontainers>=4.14.2",
     "tryceratops>=2.4.1,<3.0.0",
     "xenon>=0.9.3,<1.0.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["api", "apps", "core", "runtime", "main"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
 
 [tool.ruff]
 target-version = "py314"
