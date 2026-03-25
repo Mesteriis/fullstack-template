@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: Maximum Platform Template API
+  version: 0.1.0
+paths:
+  /api/system/health:
+    get:
+      operationId: getSystemHealth
+      summary: Read service health
+      responses:
+        "200":
+          description: Current service health snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceHealth"
+components:
+  schemas:
+    ServiceHealth:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - service
+      properties:
+        status:
+          type: string
+        service:
+          type: string

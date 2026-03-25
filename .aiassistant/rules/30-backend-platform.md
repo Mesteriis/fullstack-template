@@ -1,8 +1,42 @@
 ---
-apply: path
+apply: by file patterns
+patterns: src/backend/api/**/*, src/backend/core/**/*, src/backend/runtime/**/*, src/backend/main.py, src/backend/pyproject.toml, src/backend/tests/architecture/**/*, src/backend/tests/core/**/*, src/backend/tests/runtime/**/*, src/backend/tests/factories/**/*, src/backend/tests/fixtures/**/*, src/backend/tests/conftest.py, migrations/**/*, alembic.ini, docker/Dockerfile, docker/entrypoints/backend.sh, docker/runs/backend.sh, scripts/check_backend_architecture.py, scripts/run_backend_bandit.py, scripts/run_backend_deptry.py, scripts/run_backend_eradicate.py, scripts/run_backend_import_boundaries.py, scripts/run_backend_lint.py, scripts/run_backend_lint_fix.py, scripts/run_backend_pip_audit.sh, scripts/run_backend_pyupgrade.py, scripts/run_backend_sync.py, scripts/run_backend_tests.py, scripts/run_backend_tryceratops.py, scripts/run_backend_types.py, scripts/run_backend_xenon.py
 ---
 
 # Backend Platform
+
+Path scope:
+
+- `src/backend/api/**`
+- `src/backend/core/**`
+- `src/backend/runtime/**`
+- `src/backend/main.py`
+- `src/backend/pyproject.toml`
+- `src/backend/tests/architecture/**`
+- `src/backend/tests/core/**`
+- `src/backend/tests/runtime/**`
+- `src/backend/tests/factories/**`
+- `src/backend/tests/fixtures/**`
+- `src/backend/tests/conftest.py`
+- `migrations/**`
+- `alembic.ini`
+- `docker/Dockerfile`
+- `docker/entrypoints/backend.sh`
+- `docker/runs/backend.sh`
+- `scripts/check_backend_architecture.py`
+- `scripts/run_backend_bandit.py`
+- `scripts/run_backend_deptry.py`
+- `scripts/run_backend_eradicate.py`
+- `scripts/run_backend_import_boundaries.py`
+- `scripts/run_backend_lint.py`
+- `scripts/run_backend_lint_fix.py`
+- `scripts/run_backend_pip_audit.sh`
+- `scripts/run_backend_pyupgrade.py`
+- `scripts/run_backend_sync.py`
+- `scripts/run_backend_tests.py`
+- `scripts/run_backend_tryceratops.py`
+- `scripts/run_backend_types.py`
+- `scripts/run_backend_xenon.py`
 
 Применяй это правило при изменении backend platform, runtime, migrations и backend container wiring.
 

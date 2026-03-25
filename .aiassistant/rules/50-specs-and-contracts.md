@@ -1,8 +1,17 @@
 ---
-apply: path
+apply: by file patterns
+patterns: specs/**/*, tests/contract/**/*, src/backend/apps/*/contracts/**/*, src/frontend/shared/api/**/*, scripts/check_specs.py
 ---
 
 # Specs And Contracts
+
+Path scope:
+
+- `specs/**`
+- `tests/contract/**`
+- `src/backend/apps/*/contracts/**`
+- `src/frontend/shared/api/**`
+- `scripts/check_specs.py`
 
 Применяй это правило при изменении контрактов и contract tests.
 

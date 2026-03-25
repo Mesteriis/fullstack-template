@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://template.local/schemas/artifact.schema.json",
+  "title": "Artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "digest", "mediaType"],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "digest": {
+      "type": "string"
+    },
+    "mediaType": {
+      "type": "string"
+    }
+  }
+}

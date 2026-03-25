@@ -13,6 +13,7 @@
 - [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
 - [ADR-0014](./0014-enforce-backend-dependency-direction-and-import-boundaries.md)
 - [ADR-0016](./0016-support-github-and-gitea-ci-for-template-repositories.md)
+- [ADR-2000](../engineering/2000-centralize-template-metadata-and-self-consistency-checks.md)
 
 ## Context
 

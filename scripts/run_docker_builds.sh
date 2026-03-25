@@ -2,8 +2,15 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-sha="$(git -C "$repo_root" rev-parse --short=12 HEAD 2>/dev/null || echo local)"
-branch="$(git -C "$repo_root" rev-parse --abbrev-ref HEAD 2>/dev/null || echo local)"
+sha="${GITHUB_SHA:-}"
+if [[ -z "$sha" ]]; then
+  sha="$(git -C "$repo_root" rev-parse HEAD 2>/dev/null || echo local)"
+fi
+
+branch="${GITHUB_REF_NAME:-}"
+if [[ -z "$branch" ]]; then
+  branch="$(git -C "$repo_root" rev-parse --abbrev-ref HEAD 2>/dev/null || echo local)"
+fi
 branch="${branch//\//-}"
 
 backend_image="registry.local/template-backend"

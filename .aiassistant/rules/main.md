@@ -8,7 +8,8 @@ apply: always
 
 1. прочитать [docs/adr/README.md](../../docs/adr/README.md);
 2. прочитать [docs/adr/INDEX.md](../../docs/adr/INDEX.md);
-3. загрузить все rule-файлы из `.aiassistant/rules/`, у которых `path-re` совпадает с изменяемыми путями;
+3. загрузить все rule-файлы из `.aiassistant/rules/`, у которых `patterns` совпадают с изменяемыми repo-relative путями;
+   path matching делается по путям вроде `src/backend/apps/system/domain/model.py` или `.github/workflows/ci.yml`;
 4. считать ADR и rules источником истины для структуры репозитория, spec-first, quality gates, CI, runtime topology и продуктовых ограничений.
 
 Если изменение конфликтует с ADR, агент не должен молча обходить ограничение. Он должен:
@@ -21,4 +22,4 @@ apply: always
 
 - обновить [docs/adr/INDEX.md](../../docs/adr/INDEX.md), если меняется карта чтения или зона применения;
 - поддерживать кросс-ссылки `Related ADRs`, если решение связано с другими ADR;
-- синхронизировать связанные `.aiassistant/rules/*.md`, если меняются архитектурные ограничения или path coverage.
+- синхронизировать связанные `.aiassistant/rules/*.md`, если меняются архитектурные ограничения или file-pattern coverage.

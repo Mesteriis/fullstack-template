@@ -4,8 +4,9 @@
 
 1. Update specs first when changing public contracts.
 2. Keep ADRs in sync with architecture-level decisions.
-3. Run `make check lint test build` before opening a PR.
-4. Include migrations in the same PR as relational schema changes.
+3. Run `make doctor` before opening a PR.
+4. Run `make ci` before opening a PR that changes runtime, CI, tooling or contracts.
+5. Include migrations in the same PR as relational schema changes.
 
 ## Placement Rules
 

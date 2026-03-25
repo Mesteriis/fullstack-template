@@ -5,186 +5,199 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-REQUIRED_DIRS = [
-    "migrations",
-    "migrations/versions",
-    "docker",
-    "docs/adr",
-    "docs/adr/architecture",
-    "docs/adr/product",
-    "scripts",
-    "specs",
-    "specs/asyncapi",
-    "specs/jsonschema",
-    "specs/openapi",
-    "src",
-    "src/backend",
-    "src/backend/api",
-    "src/backend/apps",
-    "src/backend/apps/system",
-    "src/backend/apps/system/api",
-    "src/backend/apps/system/application",
-    "src/backend/apps/system/contracts",
-    "src/backend/apps/system/domain",
-    "src/backend/apps/system/infrastructure",
-    "src/backend/core",
-    "src/backend/core/bootstrap",
-    "src/backend/core/db",
-    "src/backend/core/settings",
-    "src/backend/runtime",
-    "src/backend/runtime/orchestration",
-    "src/backend/runtime/streams",
-    "src/backend/tests",
-    "src/backend/tests/apps",
-    "src/backend/tests/apps/system",
-    "src/backend/tests/architecture",
-    "src/backend/tests/core",
-    "src/backend/tests/factories",
-    "src/backend/tests/fixtures",
-    "src/backend/tests/runtime",
-    "src/frontend",
-    "src/frontend/app",
-    "src/frontend/entities",
-    "src/frontend/features",
-    "src/frontend/pages",
-    "src/frontend/shared",
-    "src/frontend/shared/api",
-    "src/frontend/shared/assets",
-    "src/frontend/shared/config",
-    "src/frontend/shared/lib",
-    "src/frontend/shared/ui",
-    "src/frontend/tests",
-    "src/frontend/tests/component",
-    "src/frontend/tests/unit",
-    "tests",
-    "tests/contract",
-    "tests/e2e",
-]
-REQUIRED_FILES = [
-    ".aiassistant/rules/main.md",
-    ".aiassistant/rules/10-adr-authoring.md",
-    ".aiassistant/rules/20-repo-governance-and-ci.md",
-    ".aiassistant/rules/30-backend-platform.md",
-    ".aiassistant/rules/31-backend-apps-and-product-model.md",
-    ".aiassistant/rules/40-frontend.md",
-    ".aiassistant/rules/50-specs-and-contracts.md",
-    ".pre-commit-config.yaml",
-    ".env.example",
-    ".gitea/workflows/ci.yml",
-    ".github/dependabot.yml",
-    ".github/ISSUE_TEMPLATE/bug_report.yml",
-    ".github/ISSUE_TEMPLATE/config.yml",
-    ".github/ISSUE_TEMPLATE/feature_request.yml",
-    ".github/PULL_REQUEST_TEMPLATE.md",
-    ".github/workflows/ci.yml",
-    "CODEOWNERS",
-    "CONTRIBUTING.md",
-    "Makefile",
-    "SECURITY.md",
-    "alembic.ini",
-    "docker/Dockerfile",
-    "docker/entrypoints/backend.sh",
-    "docker/entrypoints/frontend.sh",
-    "docker/nginx/default.conf",
-    "docker/runs/backend.sh",
-    "docker/runs/frontend.sh",
-    "docs/adr/INDEX.md",
-    "docs/adr/README.md",
-    "docs/adr/architecture/README.md",
-    "docs/adr/product/README.md",
-    "migrations/env.py",
-    "migrations/script.py.mako",
-    "scripts/check_backend_architecture.py",
-    "scripts/run_backend_bandit.py",
-    "scripts/run_backend_deptry.py",
-    "scripts/run_backend_eradicate.py",
-    "scripts/run_backend_import_boundaries.py",
-    "scripts/run_backend_lint.py",
-    "scripts/run_backend_lint_fix.py",
-    "scripts/run_backend_pip_audit.sh",
-    "scripts/run_backend_pyupgrade.py",
-    "scripts/run_backend_sync.py",
-    "scripts/run_backend_tests.py",
-    "scripts/run_backend_tryceratops.py",
-    "scripts/run_backend_types.py",
-    "scripts/run_backend_xenon.py",
-    "scripts/run_docker_builds.sh",
-    "scripts/check_specs.py",
-    "scripts/run_frontend_install.py",
-    "scripts/run_frontend_lint.py",
-    "scripts/run_frontend_lint_fix.py",
-    "scripts/run_frontend_build.py",
-    "scripts/run_frontend_tests.py",
-    "scripts/run_frontend_types.py",
-    "scripts/run_hadolint.sh",
-    "scripts/run_shellcheck.sh",
-    "scripts/run_trivy_fs.sh",
-    "specs/README.md",
-    "specs/openapi/README.md",
-    "specs/asyncapi/README.md",
-    "specs/jsonschema/README.md",
-    "src/backend/main.py",
-    "src/backend/pyproject.toml",
-    "src/frontend/eslint.config.mjs",
-    "src/frontend/package.json",
-    "src/frontend/pnpm-lock.yaml",
-    "src/frontend/tests/unit/App.spec.ts",
-]
-FORBIDDEN_ROOT_FILES = [
-    "pyproject.toml",
-    "uv.lock",
-    "package.json",
-    "package-lock.json",
-]
-FORBIDDEN_DIRS = [
-    "src/backend/registries",
-    "src/backend/application",
-    "src/backend/domain",
-    "src/backend/infrastructure",
-    "src/backend/settings",
-    "src/backend/tests/unit",
-]
-FORBIDDEN_FILES = [
-    "src/backend/__init__.py",
-]
-OPTIONAL_DIRS = [
-    "infra",
-    "packages",
-]
+REPOSITORY_SKELETON_DIRS = {
+    "migrations": "max-template requires migrations/ as the canonical relational schema history root",
+    "migrations/versions": "max-template requires migrations/versions for versioned Alembic revisions",
+    "docker": "max-template requires docker/ for container runtime definitions",
+    "docs/adr": "max-template requires docs/adr to keep decisions version-controlled",
+    "docs/adr/architecture": "max-template requires architecture ADRs as a dedicated decision category",
+    "docs/adr/product": "max-template requires product ADRs as a dedicated decision category",
+    "docs/adr/engineering": "max-template requires engineering ADRs for template- and process-level decisions",
+    "scripts": "max-template requires scripts/ for machine-enforced repository checks",
+    "specs": "max-template requires specs/ because contracts are first-class artifacts",
+    "specs/asyncapi": "max-template requires specs/asyncapi to define event contracts explicitly",
+    "specs/jsonschema": "max-template requires specs/jsonschema for canonical schema artifacts",
+    "specs/openapi": "max-template requires specs/openapi to define HTTP contracts explicitly",
+    "src": "max-template requires src/ as the polyglot application root",
+    "src/backend": "max-template requires src/backend as the canonical backend service root",
+    "src/backend/api": "max-template requires src/backend/api for transport wiring",
+    "src/backend/apps": "max-template requires src/backend/apps for bounded contexts",
+    "src/backend/apps/system": "max-template requires a system bounded context scaffold",
+    "src/backend/apps/system/api": "max-template requires api layer scaffold inside bounded contexts",
+    "src/backend/apps/system/application": "max-template requires application layer scaffold inside bounded contexts",
+    "src/backend/apps/system/contracts": "max-template requires contracts layer scaffold inside bounded contexts",
+    "src/backend/apps/system/domain": "max-template requires domain layer scaffold inside bounded contexts",
+    "src/backend/apps/system/infrastructure": "max-template requires infrastructure layer scaffold inside bounded contexts",
+    "src/backend/core": "max-template requires src/backend/core for the shared platform kernel",
+    "src/backend/core/bootstrap": "max-template requires src/backend/core/bootstrap for composition root wiring",
+    "src/backend/core/db": "max-template requires src/backend/core/db for shared persistence primitives",
+    "src/backend/core/settings": "max-template requires src/backend/core/settings for runtime configuration",
+    "src/backend/runtime": "max-template requires src/backend/runtime for worker and orchestration runtime",
+    "src/backend/runtime/orchestration": "max-template requires runtime/orchestration for broker and worker wiring",
+    "src/backend/runtime/streams": "max-template requires runtime/streams for stream-processing primitives",
+    "src/backend/tests": "max-template requires src/backend/tests for backend-local verification",
+    "src/backend/tests/apps": "max-template requires backend tests to mirror bounded contexts",
+    "src/backend/tests/apps/system": "max-template requires app-level tests for the system scaffold",
+    "src/backend/tests/architecture": "max-template requires architecture tests as a first-class backend test layer",
+    "src/backend/tests/core": "max-template requires core test scaffolding near backend ownership",
+    "src/backend/tests/factories": "max-template requires shared backend test factories",
+    "src/backend/tests/fixtures": "max-template requires shared backend test fixtures",
+    "src/backend/tests/runtime": "max-template requires runtime test scaffolding",
+    "src/frontend": "max-template requires src/frontend as the canonical frontend app root",
+    "src/frontend/app": "max-template requires app/ as part of the frontend scaffold",
+    "src/frontend/entities": "max-template requires entities/ as part of the frontend scaffold",
+    "src/frontend/features": "max-template requires features/ as part of the frontend scaffold",
+    "src/frontend/pages": "max-template requires pages/ as part of the frontend scaffold",
+    "src/frontend/shared": "max-template requires shared/ as part of the frontend scaffold",
+    "src/frontend/shared/api": "max-template requires shared/api for typed client integration",
+    "src/frontend/shared/assets": "max-template requires shared/assets for frontend asset ownership",
+    "src/frontend/shared/config": "max-template requires shared/config for frontend runtime configuration",
+    "src/frontend/shared/lib": "max-template requires shared/lib for low-level frontend helpers",
+    "src/frontend/shared/ui": "max-template requires shared/ui for reusable interface primitives",
+    "src/frontend/tests": "max-template requires src/frontend/tests for frontend-local verification",
+    "src/frontend/tests/component": "max-template requires component test coverage scaffolding",
+    "src/frontend/tests/unit": "max-template requires unit test coverage scaffolding",
+    "tests": "max-template requires tests/ for cross-application verification",
+    "tests/contract": "max-template requires tests/contract for contract-driven integration checks",
+    "tests/e2e": "max-template requires tests/e2e for cross-app smoke scenarios",
+}
+REQUIRED_TOOLING_FILES = {
+    ".aiassistant/rules/main.md": "max-template requires a global AI agent rule entrypoint",
+    ".aiassistant/rules/10-adr-authoring.md": "max-template requires ADR authoring rules for automated agents",
+    ".aiassistant/rules/20-repo-governance-and-ci.md": "max-template requires repository governance rules for automated agents",
+    ".aiassistant/rules/30-backend-platform.md": "max-template requires backend platform rules for automated agents",
+    ".aiassistant/rules/31-backend-apps-and-product-model.md": "max-template requires backend product-model rules for automated agents",
+    ".aiassistant/rules/40-frontend.md": "max-template requires frontend rules for automated agents",
+    ".aiassistant/rules/50-specs-and-contracts.md": "max-template requires contract-first rules for automated agents",
+    ".pre-commit-config.yaml": "max-template requires pre-commit configuration as the local enforcement baseline",
+    ".env.example": "max-template requires an example environment file for deterministic bootstrap",
+    ".gitea/workflows/ci.yml": "max-template requires Gitea CI because dual-CI support is mandatory",
+    ".github/dependabot.yml": "max-template requires dependency update automation",
+    ".github/ISSUE_TEMPLATE/bug_report.yml": "max-template requires issue templates as part of governance baseline",
+    ".github/ISSUE_TEMPLATE/config.yml": "max-template requires issue template configuration as part of governance baseline",
+    ".github/ISSUE_TEMPLATE/feature_request.yml": "max-template requires issue templates as part of governance baseline",
+    ".github/PULL_REQUEST_TEMPLATE.md": "max-template requires a PR template to enforce review expectations",
+    ".github/workflows/ci.yml": "max-template requires GitHub CI because dual-CI support is mandatory",
+    "CODEOWNERS": "max-template requires CODEOWNERS for repository accountability",
+    "CONTRIBUTING.md": "max-template requires CONTRIBUTING.md to document the canonical workflow",
+    "Makefile": "max-template requires a Makefile as the single DX entrypoint",
+    "SECURITY.md": "max-template requires SECURITY.md for vulnerability handling expectations",
+    "alembic.ini": "max-template requires alembic.ini in the repository root for migration orchestration",
+    "docker/Dockerfile": "max-template requires a canonical multi-stage Dockerfile",
+    "docker/entrypoints/backend.sh": "max-template requires backend container entrypoint orchestration",
+    "docker/entrypoints/frontend.sh": "max-template requires frontend container entrypoint orchestration",
+    "docker/nginx/default.conf": "max-template requires frontend runtime nginx configuration",
+    "docker/runs/backend.sh": "max-template requires backend runtime launcher script",
+    "docker/runs/frontend.sh": "max-template requires frontend runtime launcher script",
+    "docs/adr/INDEX.md": "max-template requires an ADR reading map for humans and automated agents",
+    "docs/adr/README.md": "max-template requires ADR root documentation",
+    "docs/adr/architecture/README.md": "max-template requires architecture ADR index documentation",
+    "docs/adr/engineering/README.md": "max-template requires engineering ADR index documentation",
+    "docs/adr/engineering/2000-centralize-template-metadata-and-self-consistency-checks.md": "max-template requires an engineering ADR for template metadata and self-validation",
+    "docs/adr/product/README.md": "max-template requires product ADR index documentation",
+    "migrations/env.py": "max-template requires Alembic environment wiring",
+    "migrations/script.py.mako": "max-template requires Alembic revision template wiring",
+    "scripts/check_adrs.py": "max-template requires ADR validation",
+    "scripts/check_backend_architecture.py": "max-template requires backend architecture validation",
+    "scripts/check_ci_symmetry.py": "max-template requires CI symmetry validation",
+    "scripts/check_environment.py": "max-template requires environment validation for make doctor",
+    "scripts/check_repo_structure.py": "max-template requires repository skeleton validation",
+    "scripts/check_specs.py": "max-template requires contract placement validation",
+    "scripts/check_template_consistency.py": "max-template requires self-consistency validation across Makefile, hooks and CI",
+    "scripts/run_backend_bandit.py": "max-template requires backend security lint automation",
+    "scripts/run_backend_deptry.py": "max-template requires dependency hygiene automation",
+    "scripts/run_backend_eradicate.py": "max-template requires backend dead-code/comment hygiene automation",
+    "scripts/run_backend_import_boundaries.py": "max-template requires import-boundary enforcement",
+    "scripts/run_backend_lint.py": "max-template requires backend lint automation",
+    "scripts/run_backend_lint_fix.py": "max-template requires backend autofix automation",
+    "scripts/run_backend_pip_audit.sh": "max-template requires backend dependency audit automation",
+    "scripts/run_backend_pyupgrade.py": "max-template requires Python modernisation automation",
+    "scripts/run_backend_sync.py": "max-template requires deterministic backend dependency sync",
+    "scripts/run_backend_tests.py": "max-template requires backend test automation",
+    "scripts/run_backend_tryceratops.py": "max-template requires exception-style lint automation",
+    "scripts/run_backend_types.py": "max-template requires backend type-check automation",
+    "scripts/run_backend_xenon.py": "max-template requires complexity-budget enforcement",
+    "scripts/run_docker_builds.sh": "max-template requires deterministic Docker target builds",
+    "scripts/run_frontend_build.py": "max-template requires frontend build automation",
+    "scripts/run_frontend_install.py": "max-template requires deterministic frontend dependency installation",
+    "scripts/run_frontend_lint.py": "max-template requires frontend lint automation",
+    "scripts/run_frontend_lint_fix.py": "max-template requires frontend autofix automation",
+    "scripts/run_frontend_tests.py": "max-template requires frontend test automation",
+    "scripts/run_frontend_types.py": "max-template requires frontend type-check automation",
+    "scripts/run_hadolint.sh": "max-template requires Dockerfile lint automation",
+    "scripts/run_shellcheck.sh": "max-template requires shell lint automation",
+    "scripts/run_trivy_fs.sh": "max-template requires filesystem security scanning automation",
+    "scripts/template_meta.py": "max-template requires a shared metadata loader to avoid script-level hardcodes",
+    "specs/README.md": "max-template requires root contract documentation",
+    "specs/openapi/README.md": "max-template requires OpenAPI contract documentation",
+    "specs/openapi/platform.openapi.yaml": "max-template requires a canonical OpenAPI example, not just placeholders",
+    "specs/asyncapi/README.md": "max-template requires AsyncAPI contract documentation",
+    "specs/asyncapi/platform-events.asyncapi.yaml": "max-template requires a canonical AsyncAPI example, not just placeholders",
+    "specs/jsonschema/README.md": "max-template requires JSON Schema documentation",
+    "specs/jsonschema/artifact.schema.json": "max-template requires a canonical JSON Schema example, not just placeholders",
+    "src/backend/main.py": "max-template requires a backend runtime entrypoint",
+    "src/backend/pyproject.toml": "max-template requires a backend-local Python manifest",
+    "src/frontend/eslint.config.mjs": "max-template requires frontend lint configuration",
+    "src/frontend/package.json": "max-template requires a frontend-local package manifest",
+    "src/frontend/pnpm-lock.yaml": "max-template requires a committed pnpm lockfile",
+    "src/frontend/tests/unit/App.spec.ts": "max-template requires a frontend unit-test scaffold",
+    "template.meta.toml": "max-template requires template metadata as the single source of truth for script-level ownership constants",
+}
+FORBIDDEN_LEGACY_DIRS = {
+    "src/backend/registries": "legacy nested backend namespace is forbidden; backend must stay flat at src/backend/*",
+    "src/backend/application": "legacy flat backend/application layout is forbidden; bounded contexts own application code",
+    "src/backend/domain": "legacy flat backend/domain layout is forbidden; bounded contexts own domain code",
+    "src/backend/infrastructure": "legacy flat backend/infrastructure layout is forbidden; bounded contexts own infrastructure code",
+    "src/backend/settings": "legacy flat backend/settings layout is forbidden; shared settings belong in src/backend/core/settings",
+    "src/backend/tests/unit": "legacy backend/tests/unit layout is forbidden; tests must mirror bounded contexts and architectural areas",
+}
+FORBIDDEN_LEGACY_FILES = {
+    "src/backend/__init__.py": "legacy backend package wrapper is forbidden; src/backend is a flat service root, not a namespace package",
+}
+FORBIDDEN_ROOT_MANIFESTS = {
+    "pyproject.toml": "root-level Python manifests are forbidden because app-local manifests must stay next to the owning app",
+    "uv.lock": "root-level Python lockfiles are forbidden because app-local manifests must stay next to the owning app",
+    "package.json": "root-level frontend manifests are forbidden because app-local manifests must stay next to the owning app",
+    "package-lock.json": "root-level npm lockfiles are forbidden because app-local manifests must stay next to the owning app",
+}
+RESERVED_PATHS = {
+    "infra": "reserved for future IaC and deployment-level configuration only",
+    "packages": "reserved for future shared or generated repo-wide code only",
+}
+
+
+def validate_required_paths(paths: dict[str, str], expect_dir: bool, errors: list[str]) -> None:
+    for rel_path, reason in paths.items():
+        path = ROOT / rel_path
+        exists = path.is_dir() if expect_dir else path.is_file()
+        if not exists:
+            errors.append(f"{reason}; missing {'directory' if expect_dir else 'file'}: {rel_path}")
+
+
+def validate_forbidden_paths(paths: dict[str, str], expect_dir: bool, errors: list[str]) -> None:
+    for rel_path, reason in paths.items():
+        path = ROOT / rel_path
+        exists = path.is_dir() if expect_dir else path.is_file()
+        if exists:
+            errors.append(f"{reason}; forbidden path still exists: {rel_path}")
+
+
+def validate_reserved_paths(errors: list[str]) -> None:
+    for rel_path, reason in RESERVED_PATHS.items():
+        path = ROOT / rel_path
+        if path.exists() and not path.is_dir():
+            errors.append(f"{reason}; reserved path must be a directory when present: {rel_path}")
 
 
 def main() -> int:
     errors: list[str] = []
 
-    for rel_path in REQUIRED_DIRS:
-        path = ROOT / rel_path
-        if not path.is_dir():
-            errors.append(f"missing required directory: {rel_path}")
-
-    for rel_path in REQUIRED_FILES:
-        path = ROOT / rel_path
-        if not path.is_file():
-            errors.append(f"missing required file: {rel_path}")
-
-    for rel_path in FORBIDDEN_ROOT_FILES:
-        path = ROOT / rel_path
-        if path.exists():
-            errors.append(f"root-level manifest is not allowed here: {rel_path}")
-
-    for rel_path in FORBIDDEN_DIRS:
-        path = ROOT / rel_path
-        if path.exists():
-            errors.append(f"forbidden legacy directory still exists: {rel_path}")
-
-    for rel_path in FORBIDDEN_FILES:
-        path = ROOT / rel_path
-        if path.exists():
-            errors.append(f"forbidden legacy file still exists: {rel_path}")
-
-    for rel_path in OPTIONAL_DIRS:
-        path = ROOT / rel_path
-        if path.exists() and not path.is_dir():
-            errors.append(f"optional reserved path must be a directory when present: {rel_path}")
+    validate_required_paths(REPOSITORY_SKELETON_DIRS, expect_dir=True, errors=errors)
+    validate_required_paths(REQUIRED_TOOLING_FILES, expect_dir=False, errors=errors)
+    validate_forbidden_paths(FORBIDDEN_ROOT_MANIFESTS, expect_dir=False, errors=errors)
+    validate_forbidden_paths(FORBIDDEN_LEGACY_DIRS, expect_dir=True, errors=errors)
+    validate_forbidden_paths(FORBIDDEN_LEGACY_FILES, expect_dir=False, errors=errors)
+    validate_reserved_paths(errors)
 
     if errors:
         for error in errors:

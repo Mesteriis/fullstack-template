@@ -15,6 +15,7 @@ SPEC_SUFFIXES = {
     "asyncapi": (".asyncapi.yaml", ".asyncapi.yml", ".asyncapi.json"),
     "jsonschema": (".schema.json",),
 }
+PLACEHOLDER_NAMES = {".gitkeep", "README.md"}
 
 
 def main() -> int:
@@ -41,6 +42,17 @@ def main() -> int:
                     f"invalid spec filename in specs/{family}: {path.name}; "
                     f"expected suffixes {SPEC_SUFFIXES[family]}"
                 )
+
+        concrete_specs = [
+            path
+            for path in family_root.iterdir()
+            if path.is_file() and path.name not in PLACEHOLDER_NAMES
+        ]
+        if not concrete_specs:
+            errors.append(
+                f"max-template requires specs/{family} to contain at least one canonical contract example; "
+                "README and .gitkeep placeholders are not sufficient"
+            )
 
     if errors:
         for error in errors:

@@ -1,8 +1,33 @@
 ---
-apply: path
+apply: by file patterns
+patterns: .github/**/*, .gitea/**/*, docker/**/*, .pre-commit-config.yaml, .env.example, CODEOWNERS, CONTRIBUTING.md, Makefile, SECURITY.md, template.meta.toml, scripts/check_adrs.py, scripts/check_ci_symmetry.py, scripts/check_environment.py, scripts/check_repo_structure.py, scripts/check_specs.py, scripts/check_template_consistency.py, scripts/template_meta.py, scripts/run_docker_builds.sh, scripts/run_hadolint.sh, scripts/run_shellcheck.sh, scripts/run_trivy_fs.sh
 ---
 
 # Repo Governance And CI
+
+Path scope:
+
+- `.github/**`
+- `.gitea/**`
+- `docker/**`
+- `.pre-commit-config.yaml`
+- `.env.example`
+- `CODEOWNERS`
+- `CONTRIBUTING.md`
+- `Makefile`
+- `SECURITY.md`
+- `template.meta.toml`
+- `scripts/check_adrs.py`
+- `scripts/check_ci_symmetry.py`
+- `scripts/check_environment.py`
+- `scripts/check_repo_structure.py`
+- `scripts/check_specs.py`
+- `scripts/check_template_consistency.py`
+- `scripts/template_meta.py`
+- `scripts/run_docker_builds.sh`
+- `scripts/run_hadolint.sh`
+- `scripts/run_shellcheck.sh`
+- `scripts/run_trivy_fs.sh`
 
 Применяй это правило при изменении CI, governance, repo-wide automation и container tooling.
 

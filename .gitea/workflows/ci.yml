@@ -12,80 +12,60 @@ jobs:
   backend:
     runs-on: python
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Sync backend dependencies
-        run: |
-          cd src/backend
-          uv sync --group dev
+        run: make backend-sync
 
-      - name: Validate architecture and specs
-        run: |
-          python3 scripts/check_adrs.py
-          python3 scripts/check_repo_structure.py
-          python3 scripts/check_backend_architecture.py
-          python3 scripts/check_specs.py
+      - name: Check template invariants
+        run: make check
 
-      - name: Run backend quality checks
-        run: |
-          cd src/backend
-          uv run ruff check api apps core runtime main.py tests
-          uv run ruff format --check api apps core runtime main.py tests
-          uv run mypy api apps core runtime main.py tests
-          uv run lint-imports
-          uv run bandit -q -r api apps core runtime -s B104,B105,B106
-          uv run deptry . --config pyproject.toml --per-rule-ignores 'DEP002=alembic|asyncpg|greenlet|redis|taskiq'
-          uv run tryceratops -i TRY003 -i TRY300 -i TRY301 -i TRY101 -i TRY203 -i TRY401 api apps core runtime main.py
-          uv run xenon --max-absolute F --max-modules D --max-average A api apps core runtime main.py
-          uv run pytest -x -q
+      - name: Lint backend
+        run: make backend-lint
 
-      - name: Audit backend dependencies
-        run: ./scripts/run_backend_pip_audit.sh
+      - name: Type-check backend
+        run: make backend-types
+
+      - name: Test backend
+        run: make backend-test
+
+      - name: Security-check backend
+        run: make backend-security
 
   frontend:
     runs-on: node
+    needs:
+      - backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install frontend dependencies
-        run: |
-          cd src/frontend
-          pnpm install --frozen-lockfile
+        run: make frontend-install
 
-      - name: Run frontend quality checks
-        run: |
-          cd src/frontend
-          pnpm lint
-          pnpm type-check
-          pnpm build
-          pnpm test:unit
+      - name: Lint frontend
+        run: make frontend-lint
+
+      - name: Type-check frontend
+        run: make frontend-types
+
+      - name: Test frontend
+        run: make frontend-test
+
+      - name: Build frontend
+        run: make frontend-build
 
   security-and-images:
     runs-on: main
     needs:
-      - backend
       - frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Run shellcheck and hadolint
-        run: |
-          ./scripts/run_shellcheck.sh
-          ./scripts/run_hadolint.sh
+      - name: Lint repository assets
+        run: make repo-lint
 
       - name: Run trivy filesystem scan
-        run: ./scripts/run_trivy_fs.sh
+        run: make repo-security
 
       - name: Build and tag container images
-        run: |
-          BRANCH="${GITHUB_REF_NAME//\//-}"
-          BACKEND_IMAGE="registry.local/template-backend"
-          FRONTEND_IMAGE="registry.local/template-frontend"
-
-          docker build -f docker/Dockerfile --target backend -t "$BACKEND_IMAGE:${{ github.sha }}" .
-          docker tag "$BACKEND_IMAGE:${{ github.sha }}" "$BACKEND_IMAGE:latest"
-          docker tag "$BACKEND_IMAGE:${{ github.sha }}" "$BACKEND_IMAGE:$BRANCH"
-
-          docker build -f docker/Dockerfile --target frontend -t "$FRONTEND_IMAGE:${{ github.sha }}" .
-          docker tag "$FRONTEND_IMAGE:${{ github.sha }}" "$FRONTEND_IMAGE:latest"
-          docker tag "$FRONTEND_IMAGE:${{ github.sha }}" "$FRONTEND_IMAGE:$BRANCH"
+        run: make docker-build

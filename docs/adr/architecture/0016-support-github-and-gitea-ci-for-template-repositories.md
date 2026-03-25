@@ -11,6 +11,7 @@
 - [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
 - [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
 - [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+- [ADR-2000](../engineering/2000-centralize-template-metadata-and-self-consistency-checks.md)
 
 ## Context
 

@@ -1,9 +1,23 @@
 ---
 apply: by file patterns
-patterns: src/frontend/**
+patterns: src/frontend/**/*, docker/Dockerfile, docker/entrypoints/frontend.sh, docker/runs/frontend.sh, docker/nginx/default.conf, scripts/run_frontend_build.py, scripts/run_frontend_install.py, scripts/run_frontend_lint.py, scripts/run_frontend_lint_fix.py, scripts/run_frontend_tests.py, scripts/run_frontend_types.py
 ---
 
 # Frontend
+
+Path scope:
+
+- `src/frontend/**`
+- `docker/Dockerfile`
+- `docker/entrypoints/frontend.sh`
+- `docker/runs/frontend.sh`
+- `docker/nginx/default.conf`
+- `scripts/run_frontend_build.py`
+- `scripts/run_frontend_install.py`
+- `scripts/run_frontend_lint.py`
+- `scripts/run_frontend_lint_fix.py`
+- `scripts/run_frontend_tests.py`
+- `scripts/run_frontend_types.py`
 
 Применяй это правило при изменении frontend app, frontend tests и frontend container runtime.
 

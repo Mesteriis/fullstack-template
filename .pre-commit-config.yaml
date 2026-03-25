@@ -26,8 +26,6 @@ repos:
         entry: python3 scripts/run_frontend_install.py
         language: system
         pass_filenames: false
-        stages:
-          - pre-push
 
       - id: backend-lint
         name: Run backend ruff --fix and format
@@ -71,6 +69,18 @@ repos:
         language: system
         pass_filenames: false
 
+      - id: validate-template-consistency
+        name: Validate template consistency
+        entry: python3 scripts/check_template_consistency.py
+        language: system
+        pass_filenames: false
+
+      - id: validate-ci-symmetry
+        name: Validate CI symmetry
+        entry: python3 scripts/check_ci_symmetry.py
+        language: system
+        pass_filenames: false
+
       - id: frontend-lint-fix
         name: Run frontend lint --fix
         entry: python3 scripts/run_frontend_lint_fix.py
@@ -109,54 +119,6 @@ repos:
         stages:
           - pre-push
 
-      - id: backend-bandit
-        name: Run backend bandit
-        entry: python3 scripts/run_backend_bandit.py
-        language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: backend-deptry
-        name: Run backend deptry
-        entry: python3 scripts/run_backend_deptry.py
-        language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: backend-pip-audit
-        name: Run backend pip-audit
-        entry: scripts/run_backend_pip_audit.sh
-        language: script
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: backend-tryceratops
-        name: Run backend tryceratops
-        entry: python3 scripts/run_backend_tryceratops.py
-        language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: backend-xenon
-        name: Run backend xenon
-        entry: python3 scripts/run_backend_xenon.py
-        language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: frontend-build
-        name: Build frontend
-        entry: python3 scripts/run_frontend_build.py
-        language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
       - id: frontend-types
         name: Run frontend type checks
         entry: python3 scripts/run_frontend_types.py
@@ -177,38 +139,6 @@ repos:
         name: Run frontend lint
         entry: python3 scripts/run_frontend_lint.py
         language: system
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: shellcheck-assets
-        name: Run shellcheck
-        entry: scripts/run_shellcheck.sh
-        language: script
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: hadolint-assets
-        name: Run hadolint
-        entry: scripts/run_hadolint.sh
-        language: script
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: trivy-fs
-        name: Run trivy filesystem scan
-        entry: scripts/run_trivy_fs.sh
-        language: script
-        pass_filenames: false
-        stages:
-          - pre-push
-
-      - id: docker-build-template
-        name: Build template Docker targets
-        entry: scripts/run_docker_builds.sh
-        language: script
         pass_filenames: false
         stages:
           - pre-push

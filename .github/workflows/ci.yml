@@ -12,106 +12,81 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
 
       - name: Sync backend dependencies
-        run: |
-          cd src/backend
-          uv sync --group dev
+        run: make backend-sync
 
-      - name: Validate ADR and repository structure
-        run: |
-          python3 scripts/check_adrs.py
-          python3 scripts/check_repo_structure.py
-          python3 scripts/check_backend_architecture.py
-          python3 scripts/check_specs.py
+      - name: Check template invariants
+        run: make check
 
-      - name: Run backend quality checks
-        run: |
-          cd src/backend
-          uv run ruff check api apps core runtime main.py tests
-          uv run ruff format --check api apps core runtime main.py tests
-          uv run mypy api apps core runtime main.py tests
-          uv run lint-imports
-          uv run bandit -q -r api apps core runtime -s B104,B105,B106
-          uv run deptry . --config pyproject.toml --per-rule-ignores 'DEP002=alembic|asyncpg|greenlet|redis|taskiq'
-          uv run tryceratops -i TRY003 -i TRY300 -i TRY301 -i TRY101 -i TRY203 -i TRY401 api apps core runtime main.py
-          uv run xenon --max-absolute F --max-modules D --max-average A api apps core runtime main.py
-          uv run pytest -x -q
+      - name: Lint backend
+        run: make backend-lint
 
-      - name: Audit backend dependencies
-        run: ./scripts/run_backend_pip_audit.sh
+      - name: Type-check backend
+        run: make backend-types
+
+      - name: Test backend
+        run: make backend-test
+
+      - name: Security-check backend
+        run: make backend-security
 
   frontend:
     runs-on: ubuntu-latest
+    needs:
+      - backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         with:
           version: 10
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "pnpm"
           cache-dependency-path: src/frontend/pnpm-lock.yaml
 
       - name: Install frontend dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: src/frontend
+        run: make frontend-install
 
-      - name: Run frontend quality checks
-        run: |
-          pnpm lint
-          pnpm type-check
-          pnpm build
-          pnpm test:unit
-        working-directory: src/frontend
+      - name: Lint frontend
+        run: make frontend-lint
+
+      - name: Type-check frontend
+        run: make frontend-types
+
+      - name: Test frontend
+        run: make frontend-test
+
+      - name: Build frontend
+        run: make frontend-build
 
   security-and-images:
     runs-on: ubuntu-latest
     needs:
-      - backend
       - frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install shellcheck
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
-      - name: Run shellcheck
-        run: ./scripts/run_shellcheck.sh
-
-      - name: Run hadolint
-        run: docker run --rm -i hadolint/hadolint < docker/Dockerfile
+      - name: Lint repository assets
+        run: make repo-lint
 
       - name: Run trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,misconfig
-          exit-code: "1"
+        run: make repo-security
 
       - name: Build and tag container images
-        run: |
-          BRANCH="${GITHUB_REF_NAME//\//-}"
-          BACKEND_IMAGE="registry.local/template-backend"
-          FRONTEND_IMAGE="registry.local/template-frontend"
-
-          docker build -f docker/Dockerfile --target backend -t "$BACKEND_IMAGE:${{ github.sha }}" .
-          docker tag "$BACKEND_IMAGE:${{ github.sha }}" "$BACKEND_IMAGE:latest"
-          docker tag "$BACKEND_IMAGE:${{ github.sha }}" "$BACKEND_IMAGE:$BRANCH"
-
-          docker build -f docker/Dockerfile --target frontend -t "$FRONTEND_IMAGE:${{ github.sha }}" .
-          docker tag "$FRONTEND_IMAGE:${{ github.sha }}" "$FRONTEND_IMAGE:latest"
-          docker tag "$FRONTEND_IMAGE:${{ github.sha }}" "$FRONTEND_IMAGE:$BRANCH"
+        run: make docker-build

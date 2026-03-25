@@ -1,8 +1,15 @@
 ---
-apply: path
+apply: by file patterns
+patterns: src/backend/apps/**/*, src/backend/tests/apps/**/*, tests/contract/**/*
 ---
 
 # Backend Apps And Product Model
+
+Path scope:
+
+- `src/backend/apps/**`
+- `src/backend/tests/apps/**`
+- `tests/contract/**`
 
 Применяй это правило при изменении bounded contexts, application/domain/contracts/infrastructure слоёв и app-level тестов backend.
 

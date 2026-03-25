@@ -19,6 +19,7 @@
 - [ADR-0012](./architecture/0012-define-repository-layout-and-file-placement-rules.md) - layout и placement rules;
 - [ADR-0015](./architecture/0015-enforce-template-quality-gates-and-governance-baseline.md) - quality gates, governance и security baseline;
 - [ADR-0016](./architecture/0016-support-github-and-gitea-ci-for-template-repositories.md) - CI baseline для GitHub и Gitea.
+- [ADR-2000](./engineering/2000-centralize-template-metadata-and-self-consistency-checks.md) - template metadata и self-consistency enforcement.
 
 ## Reading Map By Change Area
 
@@ -103,6 +104,7 @@
 - [ADR-0007](./architecture/0007-configuration-and-policy-as-code.md)
 - [ADR-0015](./architecture/0015-enforce-template-quality-gates-and-governance-baseline.md)
 - [ADR-0016](./architecture/0016-support-github-and-gitea-ci-for-template-repositories.md)
+- [ADR-2000](./engineering/2000-centralize-template-metadata-and-self-consistency-checks.md)
 
 ### ADR and rule changes
 
@@ -115,6 +117,7 @@
 
 - [ADR-0000](./architecture/0000-record-architecture-decisions.md)
 - [ADR-0015](./architecture/0015-enforce-template-quality-gates-and-governance-baseline.md)
+- [ADR-2000](./engineering/2000-centralize-template-metadata-and-self-consistency-checks.md)
 
 ## Maintenance Rules
 

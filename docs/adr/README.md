@@ -1,9 +1,10 @@
 # ADR
 
-Каталог ADR разделён на две независимые категории:
+Каталог ADR разделён на три независимые категории:
 
 - [architecture/](./architecture/README.md) - архитектурные решения и инженерные принципы, которые не должны зависеть от названия продукта.
 - [product/](./product/README.md) - доменные и продуктовые решения, которые описывают модель предметной области, жизненные циклы и правила платформы.
+- [engineering/](./engineering/README.md) - template-level и repository-governance решения, которые описывают self-validation, metadata, CI symmetry и инженерный baseline.
 
 Перед изменением кода, CI, контрактов, runtime topology или самих ADR сначала нужно прочитать [INDEX.md](./INDEX.md). Этот файл является обязательной картой чтения для людей и ИИ-агентов.
 
@@ -17,14 +18,16 @@
 ## Нумерация
 
 - `0000-0999` - architecture ADR;
-- `1000-1999` - product ADR.
+- `1000-1999` - product ADR;
+- `2000-2999` - engineering ADR.
 
 ## Статусы
 
 - `Proposed`
 - `Accepted`
+- `Rejected`
 - `Deprecated`
-- `Superseded by ADR-XXXX`
+- `Superseded`
 
 ## Шаблон
 
