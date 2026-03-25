@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0008](./0008-layered-testing-strategy.md)
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-0014](./0014-enforce-backend-dependency-direction-and-import-boundaries.md)
+
 ## Context
 
 Repo layout сам по себе не отвечает на вопрос, как должен быть устроен backend service изнутри. Без отдельного решения код быстро деградирует в смесь корневых каталогов вроде `api/`, `domain/`, `infrastructure/` без явной top-level модели, а импорты начинают опираться на случайный namespace layer, который не несёт архитектурной ценности.

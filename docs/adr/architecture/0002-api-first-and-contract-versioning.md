@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0001](./0001-monorepo-and-bounded-contexts.md)
+- [ADR-0008](./0008-layered-testing-strategy.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+
 ## Context
 
 Система имеет внешние и внутренние интерфейсы: HTTP API, события, схемы данных и generated clients. Если контракты появляются постфактум, начинается drift между реализацией, клиентами и тестами.

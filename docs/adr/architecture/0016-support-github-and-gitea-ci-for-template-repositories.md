@@ -6,6 +6,12 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+
 ## Context
 
 Шаблонный репозиторий должен быть пригоден как для hosted GitHub, так и для self-hosted Gitea installations. Если baseline качества существует только для одного CI окружения, шаблон перестаёт быть переносимым и начинает требовать ручной адаптации сразу после создания проекта.

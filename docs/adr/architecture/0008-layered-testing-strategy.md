@@ -6,6 +6,14 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0002](./0002-api-first-and-contract-versioning.md)
+- [ADR-0003](./0003-event-driven-internal-integration.md)
+- [ADR-0013](./0013-adopt-a-flat-backend-service-root-and-bounded-context-layout.md)
+- [ADR-0014](./0014-enforce-backend-dependency-direction-and-import-boundaries.md)
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+
 ## Context
 
 Система имеет высокую цену ошибок в интеграциях, orchestration и policy behavior. Одних unit-тестов недостаточно, а ставка только на e2e делает обратную связь медленной и дорогой.

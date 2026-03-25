@@ -61,6 +61,13 @@ REQUIRED_DIRS = [
     "tests/e2e",
 ]
 REQUIRED_FILES = [
+    ".aiassistant/rules/main.md",
+    ".aiassistant/rules/10-adr-authoring.md",
+    ".aiassistant/rules/20-repo-governance-and-ci.md",
+    ".aiassistant/rules/30-backend-platform.md",
+    ".aiassistant/rules/31-backend-apps-and-product-model.md",
+    ".aiassistant/rules/40-frontend.md",
+    ".aiassistant/rules/50-specs-and-contracts.md",
     ".pre-commit-config.yaml",
     ".env.example",
     ".gitea/workflows/ci.yml",
@@ -81,6 +88,7 @@ REQUIRED_FILES = [
     "docker/nginx/default.conf",
     "docker/runs/backend.sh",
     "docker/runs/frontend.sh",
+    "docs/adr/INDEX.md",
     "docs/adr/README.md",
     "docs/adr/architecture/README.md",
     "docs/adr/product/README.md",

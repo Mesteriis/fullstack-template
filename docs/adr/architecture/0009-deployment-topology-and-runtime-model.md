@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0005](./0005-background-jobs-and-workflow-orchestration.md)
+- [ADR-0010](./0010-use-taskiq-redis-streams-and-postgresql.md)
+- [ADR-0011](./0011-manage-postgresql-schema-with-alembic.md)
+- [ADR-0016](./0016-support-github-and-gitea-ci-for-template-repositories.md)
+
 ## Context
 
 Система обслуживает разные типы нагрузки: API requests, orchestration, фоновые вычисления, периодические reconciliation jobs и integration workloads. Если всё исполняется в одном runtime-процессе, тяжёлые задачи начинают влиять на latency и stability control plane.

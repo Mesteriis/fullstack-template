@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0004](./0004-observability-and-audit-trail.md)
+- [ADR-0005](./0005-background-jobs-and-workflow-orchestration.md)
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0010](./0010-use-taskiq-redis-streams-and-postgresql.md)
+
 ## Context
 
 Внутренние процессы платформы неоднородны по latency и часто естественно асинхронны. Синхронная оркестрация всех шагов через один request lifecycle усиливает связанность и делает систему менее отказоустойчивой.

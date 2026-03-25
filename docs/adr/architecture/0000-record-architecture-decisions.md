@@ -6,6 +6,11 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+- [ADR-0016](./0016-support-github-and-gitea-ci-for-template-repositories.md)
+
 ## Context
 
 Ключевые архитектурные решения быстро теряются в чатах, PR и устных договорённостях. Без постоянного журнала решений команде сложно понимать, почему система устроена именно так и какие ограничения уже были приняты сознательно.

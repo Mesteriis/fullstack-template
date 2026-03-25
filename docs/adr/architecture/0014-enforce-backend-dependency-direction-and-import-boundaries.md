@@ -6,6 +6,12 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0008](./0008-layered-testing-strategy.md)
+- [ADR-0013](./0013-adopt-a-flat-backend-service-root-and-bounded-context-layout.md)
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+
 ## Context
 
 Даже при хорошем package layout архитектура быстро размывается, если не зафиксировано направление зависимостей. В этом случае:

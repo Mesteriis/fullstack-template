@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0010](./0010-use-taskiq-redis-streams-and-postgresql.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-1004](../product/1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 `PostgreSQL` уже выбран как primary relational storage для metadata, state, policy decisions и audit. Без единого механизма schema evolution команда быстро приходит к drift между окружениями, ручным SQL-правкам и неявным зависимостям между кодом и схемой базы.

@@ -6,6 +6,12 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0003](./0003-event-driven-internal-integration.md)
+- [ADR-0006](./0006-authn-authz-and-machine-identities.md)
+- [ADR-1004](../product/1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Без хорошей observability платформа быстро превращается в чёрный ящик. Для эксплуатации, безопасности и объяснимости решений нужны не только технические логи, но и полноценный audit trail для чувствительных действий.

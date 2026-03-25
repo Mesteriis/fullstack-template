@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0004](./0004-observability-and-audit-trail.md)
+- [ADR-0007](./0007-configuration-and-policy-as-code.md)
+- [ADR-1001](../product/1001-trust-and-verification-policy.md)
+- [ADR-1003](../product/1003-quarantine-and-security-gates.md)
+
 ## Context
 
 Система взаимодействует не только с людьми, но и с automation, внутренними сервисами и внешними агентами. Без явной модели identity и authorization критичные операции быстро начинают защищаться несогласованно.

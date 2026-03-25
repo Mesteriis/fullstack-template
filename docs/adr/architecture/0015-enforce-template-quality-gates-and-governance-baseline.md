@@ -6,6 +6,14 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0002](./0002-api-first-and-contract-versioning.md)
+- [ADR-0008](./0008-layered-testing-strategy.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-0014](./0014-enforce-backend-dependency-direction-and-import-boundaries.md)
+- [ADR-0016](./0016-support-github-and-gitea-ci-for-template-repositories.md)
+
 ## Context
 
 Шаблонный репозиторий ценен только если он переносит не набор файлов, а работающий engineering baseline. Без этого новые проекты начинают быстро расходиться:

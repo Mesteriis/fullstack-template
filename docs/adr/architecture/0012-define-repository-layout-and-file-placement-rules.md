@@ -6,6 +6,14 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0001](./0001-monorepo-and-bounded-contexts.md)
+- [ADR-0002](./0002-api-first-and-contract-versioning.md)
+- [ADR-0013](./0013-adopt-a-flat-backend-service-root-and-bounded-context-layout.md)
+- [ADR-0015](./0015-enforce-template-quality-gates-and-governance-baseline.md)
+- [ADR-0016](./0016-support-github-and-gitea-ci-for-template-repositories.md)
+
 ## Context
 
 Высокоуровневое решение о monorepo и bounded contexts уже принято, но без точных правил размещения файлов репозиторий быстро начинает деградировать: language-specific manifest files возвращаются в корень, тесты лежат далеко от owning code, а инфраструктурные каталоги появляются ad hoc. Дополнительно важно не смешивать два уровня решений: repo-wide layout и внутреннюю package architecture отдельных приложений.

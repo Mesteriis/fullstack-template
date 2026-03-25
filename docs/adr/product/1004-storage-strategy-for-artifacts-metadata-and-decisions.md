@@ -6,6 +6,14 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0010](../architecture/0010-use-taskiq-redis-streams-and-postgresql.md)
+- [ADR-0011](../architecture/0011-manage-postgresql-schema-with-alembic.md)
+- [ADR-1000](./1000-artifact-immutability-and-promotion-model.md)
+- [ADR-1001](./1001-trust-and-verification-policy.md)
+- [ADR-1003](./1003-quarantine-and-security-gates.md)
+
 ## Context
 
 Платформа работает как минимум с тремя разными классами данных:

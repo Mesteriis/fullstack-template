@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0004](../architecture/0004-observability-and-audit-trail.md)
+- [ADR-1000](./1000-artifact-immutability-and-promotion-model.md)
+- [ADR-1001](./1001-trust-and-verification-policy.md)
+- [ADR-1002](./1002-sbom-provenance-and-signatures.md)
+
 ## Context
 
 Часть артефактов нельзя просто "не промоутить". Их нужно удерживать от потребления, передавать на ручной разбор, помечать как подозрительные и сохранять forensic trail.

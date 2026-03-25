@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0003](./0003-event-driven-internal-integration.md)
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0010](./0010-use-taskiq-redis-streams-and-postgresql.md)
+- [ADR-1004](../product/1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Часть операций системы потенциально тяжёлая, долгая и внешне зависимая. Выполнять всё inline внутри запроса неэффективно и хрупко: API latency растёт, а recovery становится сложнее.

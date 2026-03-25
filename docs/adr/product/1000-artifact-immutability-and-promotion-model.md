@@ -6,6 +6,12 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-1001](./1001-trust-and-verification-policy.md)
+- [ADR-1003](./1003-quarantine-and-security-gates.md)
+- [ADR-1004](./1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Платформа управляет жизненным циклом загруженных артефактов и должна поддерживать воспроизводимость, auditability и контролируемое продвижение между стадиями доверия. Если артефакты можно изменять "на месте", теряется причинно-следственная связь и затрудняется расследование.

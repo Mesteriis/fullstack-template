@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0005](./0005-background-jobs-and-workflow-orchestration.md)
+- [ADR-0009](./0009-deployment-topology-and-runtime-model.md)
+- [ADR-0011](./0011-manage-postgresql-schema-with-alembic.md)
+- [ADR-1004](../product/1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Платформе нужны:

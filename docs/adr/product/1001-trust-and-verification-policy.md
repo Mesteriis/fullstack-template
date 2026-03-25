@@ -6,6 +6,15 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0006](../architecture/0006-authn-authz-and-machine-identities.md)
+- [ADR-0007](../architecture/0007-configuration-and-policy-as-code.md)
+- [ADR-1000](./1000-artifact-immutability-and-promotion-model.md)
+- [ADR-1002](./1002-sbom-provenance-and-signatures.md)
+- [ADR-1003](./1003-quarantine-and-security-gates.md)
+- [ADR-1004](./1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Факт физического хранения артефакта не означает, что ему можно доверять. Для управляемой supply-chain модели нужен отдельный trust decision, основанный на verification signals и policy.

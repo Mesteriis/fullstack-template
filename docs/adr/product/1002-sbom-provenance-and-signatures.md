@@ -6,6 +6,12 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-1001](./1001-trust-and-verification-policy.md)
+- [ADR-1003](./1003-quarantine-and-security-gates.md)
+- [ADR-1004](./1004-storage-strategy-for-artifacts-metadata-and-decisions.md)
+
 ## Context
 
 Для зрелой модели доверия недостаточно проверять только уязвимости или только источник загрузки. Нужны независимые сигналы состава, происхождения и подлинности артефакта.

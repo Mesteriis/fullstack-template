@@ -6,6 +6,13 @@
 - Supersedes:
 - Superseded by:
 
+## Related ADRs
+
+- [ADR-0002](./0002-api-first-and-contract-versioning.md)
+- [ADR-0012](./0012-define-repository-layout-and-file-placement-rules.md)
+- [ADR-0013](./0013-adopt-a-flat-backend-service-root-and-bounded-context-layout.md)
+- [ADR-0014](./0014-enforce-backend-dependency-direction-and-import-boundaries.md)
+
 ## Context
 
 Система объединяет несколько приложений, контракты и эксплуатационные артефакты. Без явных границ репозиторий быстро превращается в плоский набор каталогов с высоким coupling и неясной ответственностью.
