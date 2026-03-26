@@ -21,8 +21,8 @@ backend-sync: ## Sync backend dependencies
 frontend-install: ## Install frontend dependencies
 	python3 scripts/run_frontend_install.py
 
-install-hooks: ## Install pre-commit and pre-push hooks
-	cd src/backend && uv run pre-commit install --install-hooks && uv run pre-commit install --hook-type pre-push --install-hooks
+install-hooks: ## Install local pre-commit hooks
+	cd src/backend && uv run pre-commit install --install-hooks
 
 bootstrap: ## Sync dependencies and install repository hooks
 	@echo "==> Syncing backend dependencies"
@@ -30,7 +30,7 @@ bootstrap: ## Sync dependencies and install repository hooks
 	@echo "==> Installing frontend dependencies"
 	python3 scripts/run_frontend_install.py
 	@echo "==> Installing git hooks"
-	cd src/backend && uv run pre-commit install --install-hooks && uv run pre-commit install --hook-type pre-push --install-hooks
+	cd src/backend && uv run pre-commit install --install-hooks
 
 check-environment: ## Validate required local tooling
 	python3 scripts/check_environment.py

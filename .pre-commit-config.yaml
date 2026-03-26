@@ -1,6 +1,5 @@
 default_install_hook_types:
   - pre-commit
-  - pre-push
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -20,42 +19,49 @@ repos:
         entry: python3 scripts/run_backend_sync.py
         language: system
         pass_filenames: false
+        files: &backend_dependency_files ^(src/backend/(pyproject\.toml|uv\.lock))
 
       - id: frontend-install
         name: Install frontend dependencies
         entry: python3 scripts/run_frontend_install.py
         language: system
         pass_filenames: false
+        files: &frontend_dependency_files ^(src/frontend/(package\.json|pnpm-lock\.yaml))
 
       - id: backend-lint
         name: Run backend ruff --fix and format
         entry: python3 scripts/run_backend_lint_fix.py
         language: system
         pass_filenames: false
+        files: &backend_files ^(src/backend/|migrations/|alembic\.ini|scripts/(run_backend_|check_backend_).+\.py)
 
       - id: backend-pyupgrade
         name: Run backend pyupgrade
         entry: python3 scripts/run_backend_pyupgrade.py
         language: system
         pass_filenames: false
+        files: *backend_files
 
       - id: backend-architecture
         name: Validate backend architecture
         entry: uv run --project src/backend python scripts/check_backend_architecture.py
         language: system
         pass_filenames: false
+        files: *backend_files
 
       - id: backend-observability
         name: Validate backend observability rules
         entry: uv run --project src/backend python scripts/check_backend_observability.py
         language: system
         pass_filenames: false
+        files: *backend_files
 
       - id: backend-eradicate
         name: Run backend eradicate
         entry: python3 scripts/run_backend_eradicate.py
         language: system
         pass_filenames: false
+        files: *backend_files
 
       - id: validate-adrs
         name: Validate ADR files and indexes
@@ -86,6 +92,7 @@ repos:
         entry: python3 scripts/check_frontend_architecture.py
         language: system
         pass_filenames: false
+        files: &frontend_files ^(src/frontend/|scripts/(run_frontend_|check_frontend_).+\.py)
 
       - id: validate-ci-symmetry
         name: Validate CI symmetry
@@ -98,59 +105,67 @@ repos:
         entry: python3 scripts/run_frontend_lint_fix.py
         language: system
         pass_filenames: false
+        files: *frontend_files
 
       - id: backend-tests
         name: Run backend tests
         entry: python3 scripts/run_backend_tests.py
         language: system
         pass_filenames: false
+        files: *backend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: backend-lint-check
         name: Run backend lint checks
         entry: python3 scripts/run_backend_lint.py
         language: system
         pass_filenames: false
+        files: *backend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: backend-types
         name: Run backend type checks
         entry: python3 scripts/run_backend_types.py
         language: system
         pass_filenames: false
+        files: *backend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: backend-import-boundaries
         name: Run backend import boundary checks
         entry: python3 scripts/run_backend_import_boundaries.py
         language: system
         pass_filenames: false
+        files: *backend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: frontend-types
         name: Run frontend type checks
         entry: python3 scripts/run_frontend_types.py
         language: system
         pass_filenames: false
+        files: *frontend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: frontend-tests
         name: Run frontend unit tests
         entry: python3 scripts/run_frontend_tests.py
         language: system
         pass_filenames: false
+        files: *frontend_files
         stages:
-          - pre-push
+          - pre-commit
 
       - id: frontend-lint
         name: Run frontend lint
         entry: python3 scripts/run_frontend_lint.py
         language: system
         pass_filenames: false
+        files: *frontend_files
         stages:
-          - pre-push
+          - pre-commit
