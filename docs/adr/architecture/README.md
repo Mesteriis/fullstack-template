@@ -37,3 +37,7 @@
 - [0020-centralize-platform-error-registry-and-http-error-projection.md](./0020-centralize-platform-error-registry-and-http-error-projection.md)
 - [0021-centralize-backend-observability-bootstrap-and-structured-telemetry.md](./0021-centralize-backend-observability-bootstrap-and-structured-telemetry.md)
 - [0022-group-backend-settings-into-nested-platform-models.md](./0022-group-backend-settings-into-nested-platform-models.md)
+- [0023-layer-the-frontend-into-app-pages-features-entities-and-shared.md](./0023-layer-the-frontend-into-app-pages-features-entities-and-shared.md)
+- [0024-introduce-a-ui-adapter-layer-ready-for-external-kits.md](./0024-introduce-a-ui-adapter-layer-ready-for-external-kits.md)
+- [0025-enforce-frontend-import-boundaries-and-architecture-validation.md](./0025-enforce-frontend-import-boundaries-and-architecture-validation.md)
+- [0026-adopt-a-lightweight-semantic-design-foundation-for-frontend-primitives.md](./0026-adopt-a-lightweight-semantic-design-foundation-for-frontend-primitives.md)

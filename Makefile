@@ -3,7 +3,7 @@ BACKEND_PYTHON := uv run --project src/backend python
 
 .PHONY: help \
 	backend-sync frontend-install install-hooks bootstrap \
-	check check-core check-environment doctor \
+	check check-core check-environment doctor frontend-architecture \
 	backend-fix frontend-fix fix \
 	backend-lint backend-observability frontend-lint repo-lint lint lint-core \
 	backend-types frontend-types \
@@ -40,6 +40,7 @@ check-core: ## Run repository invariants shared by local checks, doctor and CI
 	python3 scripts/check_repo_structure.py
 	$(BACKEND_PYTHON) scripts/check_backend_architecture.py
 	$(BACKEND_PYTHON) scripts/check_backend_observability.py
+	python3 scripts/check_frontend_architecture.py
 	python3 scripts/check_specs.py
 	python3 scripts/check_template_consistency.py
 	python3 scripts/check_ci_symmetry.py
@@ -83,6 +84,9 @@ backend-observability: ## Validate backend observability invariants
 
 frontend-lint: ## Run frontend lint pipeline
 	python3 scripts/run_frontend_lint.py
+
+frontend-architecture: ## Validate frontend architecture and UI boundary
+	python3 scripts/check_frontend_architecture.py
 
 repo-lint: ## Run shell and Dockerfile lint checks
 	./scripts/run_shellcheck.sh

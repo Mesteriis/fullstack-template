@@ -81,6 +81,12 @@ repos:
         language: system
         pass_filenames: false
 
+      - id: validate-frontend-architecture
+        name: Validate frontend architecture
+        entry: python3 scripts/check_frontend_architecture.py
+        language: system
+        pass_filenames: false
+
       - id: validate-ci-symmetry
         name: Validate CI symmetry
         entry: python3 scripts/check_ci_symmetry.py

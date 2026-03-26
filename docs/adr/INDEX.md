@@ -87,11 +87,16 @@
 Пути:
 
 - `src/frontend/`
+- `docs/frontend/`
 - frontend-related `docker/`
 
 Читать дополнительно:
 
 - [ADR-0008](./architecture/0008-layered-testing-strategy.md)
+- [ADR-0023](./architecture/0023-layer-the-frontend-into-app-pages-features-entities-and-shared.md)
+- [ADR-0024](./architecture/0024-introduce-a-ui-adapter-layer-ready-for-external-kits.md)
+- [ADR-0025](./architecture/0025-enforce-frontend-import-boundaries-and-architecture-validation.md)
+- [ADR-0026](./architecture/0026-adopt-a-lightweight-semantic-design-foundation-for-frontend-primitives.md)
 
 ### Specs and contract tests
 

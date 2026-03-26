@@ -13,6 +13,7 @@ REPOSITORY_SKELETON_DIRS = {
     "docs/adr/architecture": "max-template requires architecture ADRs as a dedicated decision category",
     "docs/adr/product": "max-template requires product ADRs as a dedicated decision category",
     "docs/adr/engineering": "max-template requires engineering ADRs for template- and process-level decisions",
+    "docs/frontend": "max-template requires docs/frontend for frontend architecture and UI-layer documentation",
     "docs/template": "max-template requires docs/template for self-describing template governance",
     "scripts": "max-template requires scripts/ for machine-enforced repository checks",
     "specs": "max-template requires specs/ because contracts are first-class artifacts",
@@ -97,6 +98,7 @@ REQUIRED_TOOLING_FILES = {
     "docs/adr/engineering/README.md": "max-template requires engineering ADR index documentation",
     "docs/adr/engineering/2000-centralize-template-metadata-and-self-consistency-checks.md": "max-template requires an engineering ADR for template metadata and self-validation",
     "docs/adr/product/README.md": "max-template requires product ADR index documentation",
+    "docs/frontend/ui-layer.md": "max-template requires frontend UI-layer documentation to govern primitive usage and migration",
     "docs/template/PHILOSOPHY.md": "max-template requires PHILOSOPHY.md so the repository explains why strictness is architectural, not incidental",
     "migrations/env.py": "max-template requires Alembic environment wiring",
     "migrations/script.py.mako": "max-template requires Alembic revision template wiring",
@@ -105,6 +107,7 @@ REQUIRED_TOOLING_FILES = {
     "scripts/check_backend_observability.py": "max-template requires backend observability validation to forbid print and ad-hoc logging",
     "scripts/check_ci_symmetry.py": "max-template requires CI symmetry validation",
     "scripts/check_environment.py": "max-template requires environment validation for make doctor",
+    "scripts/check_frontend_architecture.py": "max-template requires frontend architecture validation and UI-boundary enforcement",
     "scripts/check_repo_structure.py": "max-template requires repository skeleton validation",
     "scripts/check_specs.py": "max-template requires contract placement validation",
     "scripts/check_template_consistency.py": "max-template requires self-consistency validation across Makefile, hooks and CI",
@@ -144,7 +147,7 @@ REQUIRED_TOOLING_FILES = {
     "src/frontend/eslint.config.mjs": "max-template requires frontend lint configuration",
     "src/frontend/package.json": "max-template requires a frontend-local package manifest",
     "src/frontend/pnpm-lock.yaml": "max-template requires a committed pnpm lockfile",
-    "src/frontend/tests/unit/App.spec.ts": "max-template requires a frontend unit-test scaffold",
+    "src/frontend/tests/unit/app-shell.spec.ts": "max-template requires an app shell unit test for the frontend scaffold",
     "template.meta.toml": "max-template requires template metadata as the single source of truth for script-level ownership constants",
 }
 FORBIDDEN_LEGACY_DIRS = {

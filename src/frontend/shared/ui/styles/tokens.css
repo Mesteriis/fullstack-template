@@ -1,0 +1,55 @@
+:root {
+  color-scheme: light;
+
+  --font-family-sans: "Manrope", "Segoe UI", sans-serif;
+  --font-family-display: "Space Grotesk", "Segoe UI", sans-serif;
+
+  --color-ink-950: #102033;
+  --color-ink-800: #21364d;
+  --color-ink-600: #536a81;
+  --color-ink-300: #d7e0ea;
+
+  --color-accent-600: #256fe8;
+  --color-accent-100: #e8f1ff;
+  --color-success-600: #1f8a54;
+  --color-success-100: #e8f6ee;
+  --color-warning-600: #9b6114;
+  --color-warning-100: #fbf1de;
+  --color-danger-600: #b54b5f;
+  --color-danger-100: #fdecef;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  --surface-page: #f4f7fb;
+  --surface-panel: rgba(255, 255, 255, 0.96);
+  --surface-panel-muted: #eff4fb;
+  --surface-panel-raised: #ffffff;
+
+  --text-body: var(--color-ink-800);
+  --text-muted: var(--color-ink-600);
+  --text-title: var(--color-ink-950);
+  --text-inverse: #ffffff;
+
+  --border-panel: rgba(33, 54, 77, 0.12);
+  --border-panel-strong: rgba(33, 54, 77, 0.2);
+
+  --action-accent-bg: var(--color-accent-600);
+  --action-accent-soft: var(--color-accent-100);
+  --action-danger-bg: var(--color-danger-600);
+  --action-danger-soft: var(--color-danger-100);
+  --action-neutral-bg: var(--color-ink-950);
+  --action-neutral-soft: #eef2f7;
+
+  --shadow-soft: 0 20px 48px rgba(16, 32, 51, 0.12);
+}

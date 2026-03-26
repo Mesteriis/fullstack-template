@@ -42,6 +42,7 @@ REQUIRED_SCRIPTS = {
     "scripts/check_backend_observability.py",
     "scripts/check_ci_symmetry.py",
     "scripts/check_environment.py",
+    "scripts/check_frontend_architecture.py",
     "scripts/check_repo_structure.py",
     "scripts/check_specs.py",
     "scripts/check_template_consistency.py",
