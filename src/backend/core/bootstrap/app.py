@@ -1,8 +1,8 @@
-from apps.system.contracts import ServiceMetadata
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 from api import api_router
+from apps.system.contracts import ServiceMetadata
 from core.errors import PlatformError
 from core.http.handlers import handle_platform_error, handle_request_validation_error, handle_unexpected_error
 from core.observability import setup_observability
