@@ -7,8 +7,8 @@ import sys
 
 from alembic import context
 from sqlalchemy import pool
-from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, async_engine_from_config
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1] / "src" / "backend"
@@ -22,10 +22,10 @@ from core.settings import get_settings
 
 config = context.config
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.postgres_dsn)
+config.set_main_option("sqlalchemy.url", settings.db.postgres_dsn)
 
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
 
@@ -51,16 +51,36 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_migrations_online() -> None:
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = context.config.attributes.get("connection")
 
-    async with connectable.connect() as connection:
+    if isinstance(connectable, AsyncConnection):
+        await connectable.run_sync(do_run_migrations)
+        return
+
+    if isinstance(connectable, Connection):
+        do_run_migrations(connectable)
+        return
+
+    if isinstance(connectable, Engine):
+        with connectable.connect() as connection:
+            do_run_migrations(connection)
+        connectable.dispose()
+        return
+
+    if isinstance(connectable, AsyncEngine):
+        engine = connectable
+    else:
+        engine = async_engine_from_config(
+            config.get_section(config.config_ini_section, {}),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+
+    async with engine.connect() as connection:
         await connection.run_sync(do_run_migrations)
 
-    await connectable.dispose()
+    if not isinstance(connectable, AsyncEngine):
+        await engine.dispose()
 
 
 if context.is_offline_mode():

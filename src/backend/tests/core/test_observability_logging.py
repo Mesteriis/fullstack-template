@@ -30,7 +30,13 @@ class _FakeSpan:
 def test_redact_sensitive_values_masks_known_secret_fields() -> None:
     event = {
         "Authorization": "Bearer secret",
+        "api_key": "api-key",
+        "x-api-key": "x-key",
+        "access_token": "access",
         "cookie": "session=1",
+        "session_id": "session-id",
+        "jwt": "jwt-token",
+        "bearer": "bearer-token",
         "token": "abc",
         "safe": "value",
     }
@@ -39,7 +45,13 @@ def test_redact_sensitive_values_masks_known_secret_fields() -> None:
 
     assert redacted == {
         "Authorization": "[REDACTED]",
+        "api_key": "[REDACTED]",
+        "x-api-key": "[REDACTED]",
+        "access_token": "[REDACTED]",
         "cookie": "[REDACTED]",
+        "session_id": "[REDACTED]",
+        "jwt": "[REDACTED]",
+        "bearer": "[REDACTED]",
         "token": "[REDACTED]",
         "safe": "value",
     }

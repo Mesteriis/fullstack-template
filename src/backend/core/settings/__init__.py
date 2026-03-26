@@ -5,6 +5,7 @@ from core.settings.base import (
     DatabaseSettings,
     ObservabilitySettings,
     Settings,
+    SystemSettings,
     get_settings,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
     "DatabaseSettings",
     "ObservabilitySettings",
     "Settings",
+    "SystemSettings",
     "get_settings",
 ]

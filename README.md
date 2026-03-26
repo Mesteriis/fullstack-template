@@ -52,11 +52,16 @@ What is intentionally still baseline/reference:
 
 ## Quick Start
 
-1. Copy the backend env file:
+1. Copy the shared env file:
 
    ```bash
-   cp .env.example .env
+   make init-env
    ```
+
+   Backend env namespaces are section-scoped: `APP__`, `API__`, `DB__`,
+   `BROKER__`, `SYSTEM__`, `OBSERVABILITY__`. Frontend reads the same root `.env`, derives
+   its shared app/observability defaults from those namespaces, and only exposes
+   a safe frontend subset plus optional `VITE_*` overrides to browser code.
 
 2. Install dependencies and hooks:
 
@@ -64,9 +69,16 @@ What is intentionally still baseline/reference:
    make bootstrap
    ```
 
-3. Start PostgreSQL and Redis.
+3. Choose one local runtime mode.
 
-   Use your own local services, or start quick containers:
+   Full Docker ensemble:
+
+   ```bash
+   make compose-up
+   ```
+
+   Manual mode:
+   start PostgreSQL and Redis yourself, for example:
 
    ```bash
    docker run -d --name fullstack-template-postgres \
@@ -79,22 +91,22 @@ What is intentionally still baseline/reference:
      -p 6379:6379 redis:7-alpine
    ```
 
-4. Apply migrations:
+4. Manual mode only: apply migrations:
 
    ```bash
-   cd src/backend && uv run alembic -c ../../alembic.ini upgrade head
+   cd src/backend && make migrate
    ```
 
-5. Run the backend:
+5. Manual mode only: run the backend:
 
    ```bash
    cd src/backend && uv run uvicorn main:app --reload
    ```
 
-6. Run the frontend in another terminal:
+6. Manual mode only: run the frontend in another terminal:
 
    ```bash
-   pnpm -C src/frontend dev
+   cd src/frontend && make dev
    ```
 
 ## Local URLs
@@ -109,6 +121,7 @@ What is intentionally still baseline/reference:
 ## Daily Commands
 
 - `make doctor`: validate required tooling and repository invariants
+- `make init-env`: create or refresh the shared `.env`
 - `make check`: run repository invariants
 - `make lint`: run backend, frontend and repo linting
 - `make test`: run backend and frontend tests
@@ -116,7 +129,32 @@ What is intentionally still baseline/reference:
 - `make contract-test`: run cross-app contract checks from `tests/contract/`
 - `make e2e-test`: run root-level smoke scenarios from `tests/e2e/`
 - `make build`: run type checks and frontend build
+- `make compose-up`: start the root Docker ensemble
+- `make compose-down`: stop the root Docker ensemble
 - `make ci`: run the full golden-master local pipeline
+
+App-local command surfaces also exist:
+
+- `cd src/backend && make help`
+- `cd src/frontend && make help`
+
+## Docker Compose
+
+- Full local ensemble: `make compose-up`
+- Backend-only stack: `docker compose --env-file .env -f src/backend/docker-compose.yml up --build`
+- Frontend-only shell: `docker compose --env-file .env -f src/frontend/docker-compose.yml up --build`
+
+Notes:
+
+- root compose starts `postgres`, `redis`, `backend`, and `frontend`;
+- backend compose starts `postgres`, `redis`, and `backend`;
+- frontend compose starts only the nginx-served frontend shell and proxies `/api`
+  to `BACKEND_UPSTREAM`, which defaults to `http://host.docker.internal:8000`.
+- backend migration tests use `pytest-alembic` plus `testcontainers`; they create
+  a dedicated PostgreSQL database inside the test container and never run
+  against a live local database.
+- if local ports are busy, override `POSTGRES_HOST_PORT`, `REDIS_HOST_PORT`,
+  `BACKEND_HOST_PORT`, or `FRONTEND_HOST_PORT` for the compose command.
 
 ## Repository Structure
 

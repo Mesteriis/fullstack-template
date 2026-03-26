@@ -54,6 +54,7 @@ export function createHttpClient(options: HttpClientOptions): HttpClient {
             data,
           };
         } catch (error: unknown) {
+          warnJsonParseFailure(error, response);
           return {
             ok: false,
             status: response.status,
@@ -90,7 +91,8 @@ async function normalizeHttpError(response: Response): Promise<NormalizedApiErro
     if (hasMessage(details)) {
       message = details.message;
     }
-  } catch {
+  } catch (error: unknown) {
+    warnJsonParseFailure(error, response);
     details = null;
   }
 
@@ -138,4 +140,12 @@ function hasMessage(value: unknown): value is { message: string } {
     && "message" in value
     && typeof value.message === "string"
   );
+}
+
+function warnJsonParseFailure(error: unknown, response: Response): void {
+  console.warn("[http-client] Failed to parse JSON response.", {
+    error: error instanceof Error ? error.message : String(error),
+    status: response.status,
+    url: response.url || "<unknown>",
+  });
 }

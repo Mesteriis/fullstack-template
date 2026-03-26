@@ -21,6 +21,7 @@ SCRIPTS_ROOT = ROOT / "scripts"
 REQUIRED_TARGETS = {
     "help",
     "bootstrap",
+    "init-env",
     "doctor",
     "fix",
     "check",
@@ -35,6 +36,8 @@ REQUIRED_TARGETS = {
     "security-core",
     "ci",
     "docker-build",
+    "compose-up",
+    "compose-down",
 }
 REQUIRED_SCRIPTS = {
     "scripts/check_adrs.py",
@@ -45,6 +48,7 @@ REQUIRED_SCRIPTS = {
     "scripts/check_frontend_architecture.py",
     "scripts/check_http_contract_parity.py",
     "scripts/generate_frontend_openapi_client.py",
+    "scripts/init_env.py",
     "scripts/check_repo_structure.py",
     "scripts/check_specs.py",
     "scripts/check_template_consistency.py",

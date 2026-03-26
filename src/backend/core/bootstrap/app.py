@@ -1,6 +1,7 @@
 from apps.system.contracts import ServiceMetadata
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 
 from api import api_router
 from core.errors import PlatformError
@@ -9,10 +10,22 @@ from core.observability import setup_observability
 from core.settings import get_settings
 
 
+def _is_local_environment(environment: str) -> bool:
+    return environment.strip().lower() in {"local", "dev", "development"}
+
+
 def create_app() -> FastAPI:
     """Build the FastAPI application from the settings-owned bootstrap path."""
     settings = get_settings()
     app = FastAPI(title=settings.app.name)
+    if _is_local_environment(settings.app.environment):
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["http://localhost:5173"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
     setup_observability(app, settings)
     app.add_exception_handler(PlatformError, handle_platform_error)
     app.add_exception_handler(RequestValidationError, handle_request_validation_error)

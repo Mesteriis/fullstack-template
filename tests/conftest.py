@@ -62,10 +62,10 @@ def _dispose_async_engine(engine: Any) -> None:
 
 def _build_test_env() -> dict[str, str]:
     return {
-        "FULLSTACK_TEMPLATE_OBSERVABILITY__LOGS_ENABLED": "false",
-        "FULLSTACK_TEMPLATE_OBSERVABILITY__TRACES_ENABLED": "false",
-        "FULLSTACK_TEMPLATE_OBSERVABILITY__SENTRY_ENABLED": "false",
-        "FULLSTACK_TEMPLATE_OBSERVABILITY__METRICS_ENABLED": "false",
+        "OBSERVABILITY__LOGS_ENABLED": "false",
+        "OBSERVABILITY__TRACES_ENABLED": "false",
+        "OBSERVABILITY__SENTRY_ENABLED": "false",
+        "OBSERVABILITY__METRICS_ENABLED": "false",
     }
 
 

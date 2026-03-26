@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def main() -> int:
-    result = subprocess.run(["uv", "run", "pytest", "-x", "-q"], cwd=ROOT / "src" / "backend")
+    result = subprocess.run(["uv", "run", "pytest", "-x", "-q", "--test-alembic"], cwd=ROOT / "src" / "backend")
     return result.returncode
 
 

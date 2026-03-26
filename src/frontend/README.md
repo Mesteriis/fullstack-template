@@ -17,15 +17,23 @@ raw markup or local styling systems.
 Generated API files are derived artifacts. Do not edit them manually. Refresh
 them from the spec instead.
 
+Frontend runtime config is read from the repository-root `.env` via Vite `envDir`.
+Shared defaults come from `APP__`, `API__`, and a safe subset of `OBSERVABILITY__`.
+Only the derived safe subset plus optional `VITE_*` overrides are exposed to browser code.
+
 ## Commands
 
 ```bash
-pnpm install
-pnpm api:generate
-pnpm dev
-pnpm lint
-pnpm architecture:check
-pnpm type-check
-pnpm test:unit
-pnpm build
+make help
+make install
+make api-generate
+make api-check
+make dev
+make lint
+make architecture-check
+make types
+make test
+make build
+make compose-up
+make compose-down
 ```

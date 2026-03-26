@@ -77,6 +77,41 @@ describe("http client observability", () => {
 
     expect(headers.get("x-request-id")).toBe("manual-request-id");
   });
+
+  it("emits a lightweight warning when JSON parsing fails", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      url: "https://api.example.test/health",
+      json: async () => {
+        throw new Error("Invalid JSON");
+      },
+    } satisfies Partial<Response>);
+
+    const client = createHttpClient({
+      baseUrl: "https://api.example.test",
+      fetchImplementation: fetchSpy as typeof fetch,
+    });
+
+    const response = await client.requestJson("/health");
+
+    expect(response).toMatchObject({
+      ok: false,
+      status: 200,
+      error: {
+        kind: "parse",
+      },
+    });
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[http-client] Failed to parse JSON response.",
+      expect.objectContaining({
+        error: "Invalid JSON",
+        status: 200,
+        url: "https://api.example.test/health",
+      }),
+    );
+  });
 });
 
 function createDisabledObservabilityConfig() {

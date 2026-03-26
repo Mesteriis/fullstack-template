@@ -31,26 +31,68 @@ make doctor
 Copy the template env file at the repository root:
 
 ```bash
-cp .env.example .env
+make init-env
 ```
 
-The backend reads `.env` with the `FULLSTACK_TEMPLATE_` prefix. The defaults are
-already wired for local development:
+The backend reads the repository-root `.env` file. Each settings section owns its
+own namespace and only consumes its own prefix:
+
+- `APP__*`
+- `API__*`
+- `DB__*`
+- `BROKER__*`
+- `SYSTEM__*`
+- `OBSERVABILITY__*`
+
+The defaults are already wired for local development:
 
 - PostgreSQL on `localhost:5432`
 - Redis on `localhost:6379`
 - backend API on `http://localhost:8000`
 
-The frontend works without an extra env file for local development. By default it
-uses the current browser origin and Vite proxies `/api` to the backend.
+The frontend reads the same repository-root `.env` file through Vite `envDir`.
+By default it derives shared values from the backend namespaces:
 
-If you need to override frontend settings, create `src/frontend/.env.local`, for
-example:
+- `APP__NAME` for the app title
+- `APP__VERSION` / `APP__ENVIRONMENT` for release/environment fallbacks
+- `OBSERVABILITY__*` for shared observability defaults
+- `API__HOST` / `API__PORT` for the dev proxy target
+
+Only a safe derived subset is exposed to browser code. Backend-only values such
+as database settings or observability headers are not exposed. By default the
+frontend uses the current browser origin and Vite proxies `/api` to the backend.
+
+If you need to override frontend settings, add or edit `VITE_*` variables in the
+same root `.env`, for example:
 
 ```env
-VITE_APP_NAME=Fullstack Template
 VITE_DEV_PROXY_TARGET=http://127.0.0.1:8000
+VITE_OBSERVABILITY_WEB_VITALS_ENABLED=true
 ```
+
+The frontend works without an extra env file for local development.
+
+Note: the backend intentionally targets Python 3.14. Syntax that is valid in
+Python 3.14 is part of the template baseline and should not be downgraded for
+older interpreters.
+
+## Adding A Bounded Context
+
+When you add a new bounded context, keep the repository shape strict:
+
+1. Create the backend slice under `src/backend/apps/<context>/` with `api/`,
+   `application/`, `contracts/`, `domain/`, and `infrastructure/`.
+2. Add or update the public HTTP contract in `specs/openapi/platform.openapi.yaml`
+   before wiring the transport layer.
+3. Regenerate frontend API bindings with `cd src/frontend && make api-generate`.
+4. Add frontend ownership in `src/frontend/entities/<context>/`,
+   `src/frontend/features/<context>/`, and `src/frontend/pages/` only where it
+   belongs.
+5. Add backend tests near the bounded context, then update cross-app contract or
+   e2e tests only when the public surface changes.
+
+Keep `specs/` as the source of truth and let generated/frontend boundary code
+follow from it.
 
 ## Install Dependencies
 
@@ -61,6 +103,16 @@ make bootstrap
 ```
 
 ## Start Local Services
+
+Choose one local runtime mode.
+
+Full Docker ensemble:
+
+```bash
+make compose-up
+```
+
+Manual mode:
 
 Use your own PostgreSQL and Redis, or start quick containers:
 
@@ -77,10 +129,13 @@ docker run -d --name fullstack-template-redis \
 
 ## Run The Backend
 
+These steps are for manual mode. The Docker ensemble already runs migrations
+and starts the backend container for you.
+
 Apply migrations first:
 
 ```bash
-cd src/backend && uv run alembic -c ../../alembic.ini upgrade head
+cd src/backend && make migrate
 ```
 
 Start the API:
@@ -97,20 +152,40 @@ Useful backend URLs:
 
 ## Run The Frontend
 
+This step is for manual mode. The Docker ensemble already serves the frontend
+shell for you.
+
 In another terminal:
 
 ```bash
-pnpm -C src/frontend dev
+cd src/frontend && make dev
 ```
 
 Frontend URL:
 
 - app shell: `http://localhost:5173/`
 
+## Docker Compose Options
+
+If you prefer containerized local runtime:
+
+- full ensemble: `make compose-up`
+- backend-only stack: `docker compose --env-file .env -f src/backend/docker-compose.yml up --build`
+- frontend-only shell: `docker compose --env-file .env -f src/frontend/docker-compose.yml up --build`
+
+The frontend-only compose file proxies `/api` to `BACKEND_UPSTREAM`. By default
+it targets `http://host.docker.internal:8000`, so it expects a backend already
+running on the host or another reachable Docker network.
+
+If default host ports are already in use, override
+`POSTGRES_HOST_PORT`, `REDIS_HOST_PORT`, `BACKEND_HOST_PORT`, or
+`FRONTEND_HOST_PORT` when running `docker compose`.
+
 ## Quality Checks
 
 Common commands:
 
+- `make init-env`
 - `make check`
 - `make contract-parity`
 - `make lint`
@@ -122,10 +197,13 @@ Common commands:
 
 App-specific commands:
 
-- frontend API generation: `make frontend-api-generate`
-- backend tests: `python3 scripts/run_backend_tests.py`
-- frontend tests: `python3 scripts/run_frontend_tests.py`
-- frontend build: `python3 scripts/run_frontend_build.py`
+- backend commands: `cd src/backend && make help`
+- frontend commands: `cd src/frontend && make help`
+- frontend API generation: `cd src/frontend && make api-generate`
+- backend tests: `cd src/backend && make test`
+- backend migration tests: `cd src/backend && make test-migrations`
+- frontend tests: `cd src/frontend && make test`
+- frontend build: `cd src/frontend && make build`
 
 ## Typical Developer Workflow
 
@@ -135,6 +213,11 @@ App-specific commands:
 4. Make the change in the owning layer only.
 5. Run the smallest relevant checks locally.
 6. Run `make doctor` and `make ci` before a large PR or infrastructure change.
+
+Backend test note:
+- backend tests include `pytest-alembic`;
+- migration checks run against a dedicated PostgreSQL database created inside a
+  `testcontainers` container, not against your live local database.
 
 ## First-Run Problems
 
@@ -147,11 +230,11 @@ Backend cannot connect to PostgreSQL or Redis:
 
 `alembic upgrade head` fails:
 - confirm PostgreSQL is reachable and the database exists;
-- confirm `FULLSTACK_TEMPLATE_DB__POSTGRES_DSN` in `.env`.
+- confirm `DB__POSTGRES_DSN` in `.env`.
 
 Frontend shows health errors on the homepage:
 - check that the backend is running on `localhost:8000`;
-- if you changed backend host/port, update `VITE_DEV_PROXY_TARGET` or `VITE_API_BASE_URL`.
+- if you changed backend host/port, update `VITE_DEV_PROXY_TARGET` or `VITE_API_BASE_URL` in the root `.env`.
 
 Pre-commit hooks fail on unrelated paths:
 - hooks are path-scoped now, so check whether you also changed root/shared files

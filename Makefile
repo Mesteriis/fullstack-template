@@ -2,6 +2,7 @@
 BACKEND_PYTHON := uv run --project src/backend python
 
 .PHONY: help \
+	init-env compose-up compose-down \
 	backend-sync frontend-install install-hooks bootstrap \
 	check check-core check-environment doctor frontend-architecture contract-parity frontend-api-generate \
 	backend-fix frontend-fix fix \
@@ -15,6 +16,9 @@ BACKEND_PYTHON := uv run --project src/backend python
 help: ## Print available commands
 	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z0-9_.-]+:.*## / {printf "%-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+init-env: ## Initialize the shared .env from .env.example and backfill missing defaults
+	python3 scripts/init_env.py
+
 backend-sync: ## Sync backend dependencies
 	python3 scripts/run_backend_sync.py
 
@@ -24,7 +28,7 @@ frontend-install: ## Install frontend dependencies
 install-hooks: ## Install local pre-commit hooks
 	cd src/backend && uv run pre-commit install --install-hooks
 
-bootstrap: ## Sync dependencies and install repository hooks
+bootstrap: init-env ## Sync dependencies and install repository hooks
 	@echo "==> Syncing backend dependencies"
 	python3 scripts/run_backend_sync.py
 	@echo "==> Installing frontend dependencies"
@@ -58,6 +62,12 @@ doctor: ## Validate environment and core template invariants
 	@echo "==> Validating repository skeleton, ADRs and architecture"
 	@$(MAKE) check-core
 	@echo "Doctor completed successfully."
+
+compose-up: init-env ## Start the full Docker compose ensemble
+	docker compose --env-file .env up --build
+
+compose-down: ## Stop the full Docker compose ensemble
+	docker compose --env-file .env down -v --remove-orphans
 
 backend-fix: ## Run backend autofixers
 	python3 scripts/run_backend_lint_fix.py

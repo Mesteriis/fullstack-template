@@ -1,19 +1,35 @@
 from functools import lru_cache
+from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+ENV_FILE = Path(__file__).resolve().parents[4] / ".env"
 
-class AppSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+
+def _section_settings_config(prefix: str) -> SettingsConfigDict:
+    return SettingsConfigDict(
+        env_file=ENV_FILE,
+        env_file_encoding="utf-8",
+        env_prefix=prefix,
+        extra="ignore",
+    )
+
+
+class AppSettings(BaseSettings):
+    """Application metadata settings sourced from the `APP__*` env namespace."""
+
+    model_config = _section_settings_config("APP__")
 
     name: str = "Fullstack Template API"
     version: str = "0.1.0"
     environment: str = "local"
 
 
-class ApiSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class ApiSettings(BaseSettings):
+    """HTTP server settings sourced from the `API__*` env namespace."""
+
+    model_config = _section_settings_config("API__")
 
     host: str = "0.0.0.0"
     port: int = 8000
@@ -26,22 +42,44 @@ class ApiSettings(BaseModel):
         return value if value.startswith("/") else f"/{value}"
 
 
-class DatabaseSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class DatabaseSettings(BaseSettings):
+    """Database/cache settings sourced from the `DB__*` env namespace."""
+
+    model_config = _section_settings_config("DB__")
 
     postgres_dsn: str = "postgresql+asyncpg://fullstack_template:fullstack_template@localhost:5432/fullstack_template"
     redis_url: str = "redis://localhost:6379/0"
 
 
-class BrokerSettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class BrokerSettings(BaseSettings):
+    """Background broker settings sourced from the `BROKER__*` env namespace."""
+
+    model_config = _section_settings_config("BROKER__")
 
     taskiq_queue_name: str = "fullstack-template:taskiq"
     taskiq_consumer_group_name: str = "fullstack-template:backend"
 
 
-class ObservabilitySettings(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+class SystemSettings(BaseSettings):
+    """System bounded-context settings sourced from the `SYSTEM__*` env namespace."""
+
+    model_config = _section_settings_config("SYSTEM__")
+
+    health_timeout_seconds: float = 5.0
+
+    @field_validator("health_timeout_seconds")
+    @classmethod
+    def validate_health_timeout_seconds(cls, value: float) -> float:
+        if value <= 0:
+            msg = "system health timeout must be greater than 0 seconds"
+            raise ValueError(msg)
+        return value
+
+
+class ObservabilitySettings(BaseSettings):
+    """Observability settings sourced from the `OBSERVABILITY__*` env namespace."""
+
+    model_config = _section_settings_config("OBSERVABILITY__")
 
     enabled: bool = True
     logs_enabled: bool = True
@@ -93,19 +131,23 @@ class ObservabilitySettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    """Aggregate backend settings.
+
+    Each nested section is an independent `BaseSettings` model that reads the
+    repository `.env` file and only consumes its own prefixed namespace.
+    """
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=ENV_FILE,
         env_file_encoding="utf-8",
-        env_prefix="FULLSTACK_TEMPLATE_",
-        env_nested_delimiter="__",
         extra="ignore",
-        nested_model_default_partial_update=True,
     )
 
     app: AppSettings = Field(default_factory=AppSettings)
     api: ApiSettings = Field(default_factory=ApiSettings)
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     broker: BrokerSettings = Field(default_factory=BrokerSettings)
+    system: SystemSettings = Field(default_factory=SystemSettings)
     observability: ObservabilitySettings = Field(default_factory=ObservabilitySettings)
 
     @property

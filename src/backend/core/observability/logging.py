@@ -28,7 +28,23 @@ def _redact_sensitive_values(
     event_dict: MutableMapping[str, Any],
 ) -> MutableMapping[str, Any]:
     del logger, method_name
-    sensitive_keys = {"authorization", "cookie", "set-cookie", "password", "secret", "token"}
+    sensitive_keys = {
+        "access_token",
+        "api_key",
+        "apikey",
+        "authorization",
+        "bearer",
+        "cookie",
+        "jwt",
+        "password",
+        "refresh_token",
+        "secret",
+        "session",
+        "session_id",
+        "set-cookie",
+        "token",
+        "x-api-key",
+    }
     for key, value in tuple(event_dict.items()):
         if key.lower() in sensitive_keys and value is not None:
             event_dict[key] = "[REDACTED]"
