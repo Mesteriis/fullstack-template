@@ -15,7 +15,7 @@ def test_main_module_imports_and_runs_uvicorn(monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(
         "core.observability.setup_logging", lambda received_settings: calls.append(("logging", received_settings))
     )
-    monkeypatch.setattr("core.bootstrap.create_app", lambda: "app")
+    monkeypatch.setattr("core.bootstrap.create_app", lambda *, settings=None: "app")
     monkeypatch.setattr("uvicorn.run", lambda *args, **kwargs: calls.append(("uvicorn", (args, kwargs))))
     sys.modules.pop("main", None)
 
@@ -42,7 +42,7 @@ def test_main_module_executes_run_when_started_as_script(monkeypatch: pytest.Mon
 
     monkeypatch.setattr("core.settings.get_settings", lambda: settings)
     monkeypatch.setattr("core.observability.setup_logging", lambda received_settings: None)
-    monkeypatch.setattr("core.bootstrap.create_app", lambda: "app")
+    monkeypatch.setattr("core.bootstrap.create_app", lambda *, settings=None: "app")
     monkeypatch.setattr("uvicorn.run", lambda *args, **kwargs: calls.append((args, kwargs)))
     sys.modules.pop("main", None)
 

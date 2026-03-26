@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Any
 
 import pytest
@@ -24,6 +25,14 @@ class _TimeoutDatabasePort(_HealthyPort):
 class _FailingRedisPort(_HealthyPort):
     async def ping_redis(self) -> None:
         raise RedisError("redis unavailable")
+
+
+class _TimeoutBothPort(_HealthyPort):
+    async def ping_database(self) -> None:
+        await asyncio.sleep(0.3)
+
+    async def ping_redis(self) -> None:
+        await asyncio.sleep(0.3)
 
 
 class _CaptureLogger:
@@ -84,3 +93,27 @@ def test_readiness_logs_failures_but_keeps_safe_api_details(monkeypatch: pytest.
             },
         )
     ]
+
+
+def test_readiness_probes_run_concurrently_with_per_dependency_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, dict[str, Any]]] = []
+    service = SystemStatusService(
+        settings=build_settings(system={"health_timeout_seconds": 0.1}),
+        health_port=_TimeoutBothPort(),
+    )
+
+    monkeypatch.setattr(system_services_module, "SYSTEM_HEALTH_LOGGER", _CaptureLogger(calls))
+
+    started_at = time.perf_counter()
+    readiness = run_async(service.get_readiness())
+    elapsed = time.perf_counter() - started_at
+
+    assert readiness.status == "error"
+    assert tuple(check.model_dump() for check in readiness.checks) == (
+        {"name": "postgres", "status": "error", "detail": "timeout"},
+        {"name": "redis", "status": "error", "detail": "timeout"},
+    )
+    assert elapsed < 0.18
+    assert len(calls) == 2

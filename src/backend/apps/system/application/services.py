@@ -22,10 +22,12 @@ class SystemStatusService:
         return LivenessProbe(status="ok", service=self.settings.app.name)
 
     async def get_readiness(self) -> ReadinessProbe:
-        checks = [
-            await self._probe_database(),
-            await self._probe_redis(),
-        ]
+        checks = list(
+            await asyncio.gather(
+                self._probe_database(),
+                self._probe_redis(),
+            )
+        )
         status: Literal["ok", "error"] = "ok" if all(check.status == "ok" for check in checks) else "error"
 
         return ReadinessProbe(status=status, service=self.settings.app.name, checks=tuple(checks))

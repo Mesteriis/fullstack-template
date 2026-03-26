@@ -185,7 +185,7 @@ def alembic_config() -> Config:
 
 @pytest.fixture()
 def app_factory(postgres_dsn: str, redis_url: str) -> Iterator[Callable[..., FastAPI]]:
-    runtimes: list[tuple[pytest.MonkeyPatch, object]] = []
+    runtimes: list[tuple[pytest.MonkeyPatch, Callable[[], None]]] = []
 
     def factory(
         *,
@@ -206,14 +206,14 @@ def app_factory(postgres_dsn: str, redis_url: str) -> Iterator[Callable[..., Fas
         bootstrap_module = importlib.import_module("core.bootstrap.app")
         session_module = importlib.import_module("core.db.session")
         app = cast(FastAPI, bootstrap_module.create_app())
-        runtimes.append((monkeypatch, session_module.async_engine))
+        runtimes.append((monkeypatch, lambda: asyncio.run(session_module.dispose_async_engine())))
         return app
 
     try:
         yield factory
     finally:
-        for monkeypatch, engine in reversed(runtimes):
-            _dispose_async_engine(engine)
+        for monkeypatch, dispose_runtime in reversed(runtimes):
+            dispose_runtime()
             monkeypatch.undo()
         _clear_settings_cache()
 

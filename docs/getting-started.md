@@ -102,6 +102,11 @@ Bootstrap both apps and install local git hooks:
 make bootstrap
 ```
 
+Local hook behavior:
+
+- `pre-commit`: fast, path-scoped checks for the files you touched
+- `pre-push`: full `make ci` gate so lint/test/build/security regressions are caught before CI
+
 ## Start Local Services
 
 Choose one local runtime mode.

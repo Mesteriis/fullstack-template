@@ -235,7 +235,7 @@ def test_tracing_helpers_cover_provider_setup_and_flush(monkeypatch: pytest.Monk
         "RedisInstrumentor",
         lambda: SimpleNamespace(instrument=lambda: calls.append("redis")),
     )
-    monkeypatch.setattr(observability_tracing_module, "async_engine", SimpleNamespace(sync_engine="engine"))
+    monkeypatch.setattr(observability_tracing_module, "get_async_engine", lambda: SimpleNamespace(sync_engine="engine"))
     monkeypatch.setattr(app, "add_event_handler", lambda event, handler: events.append((event, handler)))
 
     assert observability_tracing_module._parse_otlp_headers("") == {}

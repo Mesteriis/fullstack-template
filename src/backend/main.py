@@ -6,11 +6,16 @@ from fastapi import FastAPI
 
 
 def bootstrap_runtime() -> tuple[Settings, FastAPI]:
-    """Create the runtime settings/app pair used by the ASGI entrypoint."""
+    """Create the runtime settings/app pair used by the ASGI entrypoint.
+
+    The module still exposes a top-level ``app`` for ASGI servers, but all
+    bootstrap work is centralized here so tests and runtime composition use the
+    same explicit path.
+    """
 
     runtime_settings = get_settings()
     setup_logging(runtime_settings)
-    runtime_app = create_app()
+    runtime_app = create_app(settings=runtime_settings)
     return runtime_settings, runtime_app
 
 

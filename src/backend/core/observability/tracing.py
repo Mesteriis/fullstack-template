@@ -9,7 +9,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.trace.sampling import ParentBasedTraceIdRatio
 
-from core.db import async_engine
+from core.db import get_async_engine
 from core.settings import Settings
 
 _FASTAPI_INSTRUMENTED_APPS: set[int] = set()
@@ -88,7 +88,7 @@ def setup_tracing(app: FastAPI, settings: Settings) -> None:
         _FASTAPI_INSTRUMENTED_APPS.add(app_key)
 
     if settings.observability.instrument_sqlalchemy and not _SQLALCHEMY_INSTRUMENTED:
-        SQLAlchemyInstrumentor().instrument(engine=async_engine.sync_engine)
+        SQLAlchemyInstrumentor().instrument(engine=get_async_engine().sync_engine)
         _SQLALCHEMY_INSTRUMENTED = True
 
     if settings.observability.instrument_redis and not _REDIS_INSTRUMENTED:

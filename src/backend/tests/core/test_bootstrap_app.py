@@ -26,3 +26,22 @@ def test_create_app_does_not_enable_cors_outside_local_dev(monkeypatch: pytest.M
     app = bootstrap_app_module.create_app()
 
     assert all(cast(Any, middleware).cls is not CORSMiddleware for middleware in app.user_middleware)
+
+
+def test_create_app_uses_explicit_settings_without_calling_global_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = build_settings(app={"name": "Explicit App", "environment": "test"}, api={"prefix": "/api"})
+
+    monkeypatch.setattr(bootstrap_app_module, "setup_observability", lambda app, settings: None)
+
+    def fail_get_settings() -> None:
+        msg = "create_app() should not read global settings when explicit settings are provided"
+        raise AssertionError(msg)
+
+    monkeypatch.setattr(bootstrap_app_module, "get_settings", fail_get_settings)
+
+    app = bootstrap_app_module.create_app(settings=settings)
+
+    assert app.title == "Explicit App"
+    assert str(app.url_path_for("read_root")) == "/"

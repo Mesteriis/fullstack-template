@@ -7,7 +7,7 @@ from core.db import session as db_session_module
 from core.db import uow as db_uow_module
 from core.db.base import NAMING_CONVENTION
 from core.db.persistence import AsyncQueryService, AsyncRepository, PersistenceComponent
-from core.db.session import get_db_session, ping_database
+from core.db.session import dispose_async_engine, get_async_engine, get_db_session, ping_database
 from core.db.uow import AsyncUnitOfWork, BaseAsyncUnitOfWork, SessionUnitOfWork, async_session_scope, get_uow
 from tests.helpers import run_async
 
@@ -83,11 +83,61 @@ def test_ping_database_executes_probe_query(monkeypatch: pytest.MonkeyPatch) -> 
         async def __aexit__(self, exc_type: object, exc: object, traceback: object) -> None:
             return None
 
-    monkeypatch.setattr(db_session_module, "async_engine", SimpleNamespace(connect=lambda: FakeConnectionContext()))
+    monkeypatch.setattr(
+        db_session_module, "get_async_engine", lambda: SimpleNamespace(connect=lambda: FakeConnectionContext())
+    )
 
     run_async(ping_database())
 
     assert executed == ["SELECT 1"]
+
+
+def test_async_engine_is_created_lazily_and_cached(monkeypatch: pytest.MonkeyPatch) -> None:
+    created: list[str] = []
+    fake_engine = object()
+
+    def fake_create_async_engine(dsn: str, *, future: bool, pool_pre_ping: bool) -> object:
+        assert future is True
+        assert pool_pre_ping is True
+        created.append(dsn)
+        return fake_engine
+
+    monkeypatch.setattr(db_session_module, "_async_engine", None)
+    monkeypatch.setattr(db_session_module, "_async_session_factory", None)
+    monkeypatch.setattr(
+        db_session_module,
+        "get_settings",
+        lambda: SimpleNamespace(db=SimpleNamespace(postgres_dsn="postgresql+asyncpg://lazy:test@localhost/lazy")),
+    )
+    monkeypatch.setattr(
+        db_session_module,
+        "create_async_engine",
+        fake_create_async_engine,
+    )
+
+    assert created == []
+    assert get_async_engine() is fake_engine
+    assert get_async_engine() is fake_engine
+    assert created == ["postgresql+asyncpg://lazy:test@localhost/lazy"]
+
+
+def test_dispose_async_engine_resets_cached_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeEngine:
+        def __init__(self) -> None:
+            self.dispose_calls = 0
+
+        async def dispose(self) -> None:
+            self.dispose_calls += 1
+
+    engine = FakeEngine()
+    monkeypatch.setattr(db_session_module, "_async_engine", cast(Any, engine))
+    monkeypatch.setattr(db_session_module, "_async_session_factory", cast(Any, object()))
+
+    run_async(dispose_async_engine())
+
+    assert engine.dispose_calls == 1
+    assert db_session_module._async_engine is None
+    assert db_session_module._async_session_factory is None
 
 
 def test_base_async_unit_of_work_proxies_session_methods() -> None:

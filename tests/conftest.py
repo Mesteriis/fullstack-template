@@ -56,10 +56,6 @@ def _clear_settings_cache() -> None:
     settings_module.get_settings.cache_clear()
 
 
-def _dispose_async_engine(engine: Any) -> None:
-    asyncio.run(engine.dispose())
-
-
 def _build_test_env() -> dict[str, str]:
     return {
         "OBSERVABILITY__LOGS_ENABLED": "false",
@@ -94,7 +90,7 @@ def _build_readiness_payload(
 
 @pytest.fixture()
 def app_factory() -> Iterator[Callable[..., FastAPI]]:
-    runtimes: list[tuple[pytest.MonkeyPatch, object]] = []
+    runtimes: list[tuple[pytest.MonkeyPatch, Callable[[], None]]] = []
 
     def factory(*, health_status: Literal["ok", "error"] = "ok") -> FastAPI:
         monkeypatch = pytest.MonkeyPatch()
@@ -125,14 +121,14 @@ def app_factory() -> Iterator[Callable[..., FastAPI]]:
 
         app = cast(FastAPI, bootstrap_module.create_app())
         app.dependency_overrides[deps_module.get_system_status_service] = FakeSystemStatusService
-        runtimes.append((monkeypatch, session_module.async_engine))
+        runtimes.append((monkeypatch, lambda: asyncio.run(session_module.dispose_async_engine())))
         return app
 
     try:
         yield factory
     finally:
-        for monkeypatch, engine in reversed(runtimes):
-            _dispose_async_engine(engine)
+        for monkeypatch, dispose_runtime in reversed(runtimes):
+            dispose_runtime()
             monkeypatch.undo()
         _clear_settings_cache()
 

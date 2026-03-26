@@ -1,5 +1,6 @@
 default_install_hook_types:
   - pre-commit
+  - pre-push
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -183,3 +184,11 @@ repos:
         files: *frontend_files
         stages:
           - pre-commit
+
+      - id: full-ci-before-push
+        name: Run full CI pipeline before push
+        entry: bash -c 'cd "$(git rev-parse --show-toplevel)/../.." && uv run --project src/backend make ci'
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-push

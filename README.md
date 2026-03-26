@@ -69,6 +69,9 @@ What is intentionally still baseline/reference:
    make bootstrap
    ```
 
+   `pre-commit` stays path-scoped for fast local feedback. `pre-push` now runs
+   the full `make ci` pipeline before anything is sent to CI.
+
 3. Choose one local runtime mode.
 
    Full Docker ensemble:
